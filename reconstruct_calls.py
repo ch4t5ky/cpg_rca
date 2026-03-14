@@ -47,7 +47,7 @@ from matplotlib.lines import Line2D
 import numpy as np
 
 # Import CPG utilities
-from log2cpg import (
+from log2cpg2 import (
     process_service_cpg,
     resolve_inter_service_edges,
     fast_match,

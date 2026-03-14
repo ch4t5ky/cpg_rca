@@ -60,7 +60,7 @@ import numpy as np
 import sys
 sys.path.insert(0, str(Path(__file__).parent))
 
-from log2cpg import process_service_cpg, resolve_inter_service_edges, fast_match
+from log2cpg2 import process_service_cpg, resolve_inter_service_edges, fast_match
 
 
 class UnifiedCache:
