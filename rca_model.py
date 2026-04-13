@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-local_llm_rca.py
-================
+rca_model.py
+============
 Root Cause Analysis using LOCAL LLM (no external API)
 
 Uses a local transformer model (loaded with torch) to analyze the graph

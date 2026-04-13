@@ -22,11 +22,16 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
 import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).parent))
+from find_errors import find_errors_in_logs
 
 
 # ===========================================================================
@@ -410,14 +415,7 @@ def aggregate_by_message_similarity(
 def load_errors_from_csv(csv_path: str) -> List[dict]:
     """Load errors from CSV and detect them."""
     print(f"[1] Loading errors from CSV: {csv_path}")
-    
-    # Import find_errors module
-    import sys
-    from pathlib import Path
-    sys.path.insert(0, str(Path(__file__).parent))
-    
-    from find_errors import find_errors_in_logs
-    
+
     errors, summary = find_errors_in_logs(csv_path)
     
     print(f"    Found {len(errors)} errors")

@@ -1,0 +1,254 @@
+digraph FiveLayer_DCG_Final {
+    rankdir=LR;  // Left to Right (horizontal)
+    node [shape=box, style=filled, fontname="Helvetica", fontsize=11];
+    edge [fontname="Helvetica", fontsize=10];
+    bgcolor=white;
+    
+    // ================================
+    // LAYER 1: USER AND REQUESTS
+    // ================================
+    subgraph cluster_layer1 {
+        label=<<b>Layer 1:<br/>User &amp; Requests</b>>;
+        style=filled;
+        color=lightblue;
+        fontsize=13;
+        fontname="Helvetica-Bold";
+        
+        node [fillcolor=lightyellow, shape=ellipse];
+        User [label="User"];
+        
+        node [fillcolor=white, shape=parallelogram];
+        UserReq [label="User\nRequest"];
+    }
+    
+    // ================================
+    // LAYER 2: INFORMATION SYSTEM
+    // ================================
+    subgraph cluster_layer2 {
+        label=<<b>Layer 2: Information System (Services with Methods)</b>>;
+        style=filled;
+        color=green;
+        fontsize=13;
+        fontname="Helvetica-Bold";
+        
+        subgraph cluster_frontend {
+            label="Frontend Service";
+            style=filled;
+            color=white;
+            
+            node [fillcolor=wheat, shape=box];
+            FM1 [label="Method 1"];
+            FM2 [label="Method 2"];
+        }
+        
+        node [fillcolor=lavender, shape=parallelogram];
+        BackendReq [label="Backend\nRequest"];
+        BackendResp [label="Backend\nResponse"];
+        
+        subgraph cluster_backend {
+            label="Backend Service";
+            style=filled;
+            color=white;
+            
+            node [fillcolor=wheat, shape=box];
+            BM1 [label="Method 1"];
+            BM2 [label="Method 2"];
+        }
+        
+        node [fillcolor=lavender, shape=parallelogram];
+        DBReq [label="Database\nRequest"];
+        DBResp [label="Database\nResponse"];
+        
+        node [fillcolor=lightgray, shape=cylinder];
+        DB [label="Database"];
+    }
+    
+    // ================================
+    // LAYER 3: INFRASTRUCTURE
+    // ================================
+    subgraph cluster_layer3 {
+        label=<<b>Layer 3:<br/>Infrastructure</b>>;
+        style=filled;
+        color=pink;
+        fontsize=13;
+        fontname="Helvetica-Bold";
+        
+        node [fillcolor=lightpink, shape=cylinder];
+        CPU [label="CPU"];
+        RAM [label="RAM"];
+        Disk [label="Disk"];
+    }
+    
+    // ================================
+    // LAYER 4: TELEMETRY
+    // ================================
+    subgraph cluster_layer4 {
+        label=<<b>Layer 4: Telemetry</b>>;
+        style=filled;
+        color=lightyellow;
+        fontsize=13;
+        fontname="Helvetica-Bold";
+        
+        subgraph cluster_good_logs {
+            label="Good Logs";
+            style=filled;
+            color=green;
+            
+            node [fillcolor=white, shape=note];
+            InfoLog1 [label="Info:\nRequest\nreceived"];
+            InfoLog2 [label="Info:\nProcessing\nstarted"];
+        }
+        
+        subgraph cluster_error_logs {
+            label="Error Logs";
+            style=filled;
+            color=lightsalmon;
+            
+            node [fillcolor=lightsalmon, shape=note];
+            ErrorLog1 [label="Error:\nConnection\ntimeout"];
+            ErrorLog2 [label="Error:\nQuery\nfailed"];
+        }
+        
+        subgraph cluster_metrics {
+            label="Metrics";
+            style=filled;
+            color=lightgoldenrodyellow;
+            
+            node [fillcolor=lightgoldenrodyellow, shape=box];
+            ReqMetric [label="Request\nMetric"];
+            ResMetric [label="Resource\nMetric"];
+        }
+        
+        subgraph cluster_traces {
+            label="Traces";
+            style=filled;
+            color=lightcyan;
+            
+            node [fillcolor=lightcyan, shape=box];
+            Trace [label="Request\nTrace"];
+        }
+    }
+    
+    // ================================
+    // LAYER 5: INCIDENT MANAGEMENT
+    // ================================
+    subgraph cluster_layer5 {
+        label=<<b>Layer 5:<br/>Incident<br/>Management</b>>;
+        style=filled;
+        color=mistyrose;
+        fontsize=13;
+        fontname="Helvetica-Bold";
+        
+        node [fillcolor=orange, shape=diamond];
+        Anomaly [label="Anomaly\nMetric"];
+        
+        node [fillcolor=red, shape=box];
+        Alert [label="Alert"];
+        
+        node [fillcolor=darkred, fontcolor=white, shape=box, style="filled,rounded"];
+        Incident [label="INCIDENT"];
+    }
+    
+    // ================================
+    // RELATIONSHIPS - REQUESTS (FORWARD)
+    // ================================
+    
+    // User initiates request
+    User -> UserReq [label="initiate", penwidth=2, color=blue];
+    UserReq -> FM1 [label="send", penwidth=2, color=blue];
+    
+    // Frontend: Method 1 executes Method 2
+    FM1 -> FM2 [label="execute", penwidth=1.5, color=darkgreen];
+    
+    // Frontend Method 2 sends request to Backend Method 1
+    FM2 -> BackendReq [label="send", penwidth=2, color=navy];
+    BackendReq -> BM1 [label="route", penwidth=2, color=navy];
+    
+    // Backend: Method 1 executes Method 2
+    BM1 -> BM2 [label="execute", penwidth=1.5, color=darkgreen];
+    
+    // Backend Method 2 calls Database
+    BM2 -> DBReq [label="send", penwidth=2, color=navy];
+    DBReq -> DB [label="query", penwidth=2, color=navy];
+    
+    // ================================
+    // RELATIONSHIPS - RESPONSES (BACKWARD)
+    // ================================
+    
+    // Database returns response to Method 2 (Backend)
+    DB -> DBResp [label="return", penwidth=2, color=purple, style=dashed];
+    DBResp -> BM2 [label="to", penwidth=2, color=purple, style=dashed];
+    
+    // Backend Method 2 returns to Method 1 (Backend)
+    BM2 -> BM1 [label="return", penwidth=2, color=purple, style=dashed];
+    
+    // Backend Method 1 returns to Frontend
+    BM1 -> BackendResp [label="return", penwidth=2, color=purple, style=dashed];
+    BackendResp -> FM2 [label="to", penwidth=2, color=purple, style=dashed];
+    
+    // Frontend Method 2 returns to Method 1
+    FM2 -> FM1 [label="return", penwidth=2, color=purple, style=dashed];
+    
+
+    // ================================
+    // LAYER 2 -> LAYER 3: INFRASTRUCTURE
+    // ================================
+    
+    FM1 -> CPU [label="use", style=dashed, color=magenta, constraint=false];
+    FM1 -> RAM [label="use", style=dashed, color=magenta, constraint=false];
+    BM1 -> CPU [label="use", style=dashed, color=magenta, constraint=false];
+    BM1 -> RAM [label="use", style=dashed, color=magenta, constraint=false];
+    DB -> CPU [label="use", style=dashed, color=magenta, constraint=false];
+    DB -> RAM [label="use", style=dashed, color=magenta, constraint=false];
+    DB -> Disk [label="use", style=dashed, color=magenta, constraint=false];
+    
+    // ================================
+    // LAYER 2 -> LAYER 4: TELEMETRY
+    // ================================
+    
+    // Good logs
+    FM1 -> InfoLog1 [label="generate", color=green];
+    BM1 -> InfoLog2 [label="generate", color=green];
+    
+    // Error logs
+    BM2 -> ErrorLog1 [label="generate", color=red];
+    DB -> ErrorLog2 [label="generate", color=red];
+    
+    // Metrics
+    FM1 -> ReqMetric [label="generate", color=gold];
+    BM1 -> ReqMetric [label="generate", color=gold];
+    
+    // Traces
+    FM1 -> Trace [label="generate", color=cyan];
+    BM1 -> Trace [label="generate", color=cyan];
+    
+    // ================================
+    // LAYER 3 -> LAYER 4: RESOURCE METRICS
+    // ================================
+    
+    CPU -> ResMetric [label="generate", penwidth=2, color=orange];
+    RAM -> ResMetric [label="generate", penwidth=2, color=orange];
+    Disk -> ResMetric [label="generate", penwidth=2, color=orange];
+    
+    // ================================
+    // LAYER 4 -> LAYER 5: INCIDENTS
+    // ================================
+    
+    // Metrics become Anomalies
+    ReqMetric -> Anomaly [label="detect\nanomaly", penwidth=2, color=red];
+    ResMetric -> Anomaly [label="detect\nanomaly", penwidth=2, color=red];
+    
+    // Anomalies trigger Alerts
+    Anomaly -> Alert [label="trigger", penwidth=2, color=red];
+    
+    // Alerts create Incidents
+    Alert -> Incident [label="create", penwidth=3, color=darkred];
+    
+    // Error logs create Incidents
+    ErrorLog1 -> Incident [label="create", penwidth=3, color=darkred];
+    ErrorLog2 -> Incident [label="create", penwidth=3, color=darkred];
+    
+    // Causal chain
+    ErrorLog1 -> ErrorLog2 [label="cause", penwidth=3, color=black, style=bold];
+    ErrorLog2 -> Incident [label="cause", penwidth=3, color=black, style=bold];
+}
