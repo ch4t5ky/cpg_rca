@@ -59,9 +59,27 @@ except Exception:
 # ---------------------------------------------------------------------------
 
 LOG_METHOD_NAMES: Set[str] = {
+    # Java logging frameworks
     "info", "warn", "warning", "debug", "error", "trace", "fatal", "log",
+    
+    # System output streams (for catching shutdown hooks, startup messages, etc.)
+    "println",      # System.out.println(), System.err.println()
+    "print",        # System.out.print(), System.err.print()
+    
+    # SLF4J / Logback
+    "slf4j",
+    
+    # Apache Commons Logging
+    "commons",
+    
+    # Log4j
+    "log4j",
+    
+    # Custom logger patterns
+    "write",        # Writer.write()
+    "WriteLine"
+    "flush",        # BufferedWriter.flush()
 }
-
 AST_LABEL = "AST"
 CALL_LABEL = "CALL"
 REACHING_DEF_LABEL = "REACHING_DEF"
@@ -217,7 +235,7 @@ def _clean_text_selective(text: str) -> str:
     # Normalize whitespace
     text = re.sub(r'\s+', ' ', text)
     text = text.strip()
-
+    text = text.lower()
     return text
 
 def _normalize_code_selective(s: str) -> str:
