@@ -1,6 +1,7 @@
 # My Exclude
 services/
 dataset/
+temp/
 *.zip
 cache/
 output/
@@ -207,6 +208,8 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+.claude
+.idea
 
 # Marimo
 marimo/_static/
