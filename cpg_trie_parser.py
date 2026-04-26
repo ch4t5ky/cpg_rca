@@ -48,11 +48,7 @@ import networkx as nx
 from matplotlib.patches import Circle, Polygon, PathPatch
 from matplotlib.path import Path as MplPath
 
-try:
-    from networkx.drawing.nx_pydot import read_dot
-    PYDOT_OK = True
-except Exception:
-    PYDOT_OK = False
+import pydot
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -574,7 +570,7 @@ def _draw_curved_edge(ax, x0, y0, x1, y1, color="#93c5fd", lw=1.8):
     patch = PathPatch(path, facecolor="none", edgecolor=color, lw=lw)
     ax.add_patch(patch)
 
-def _draw_circle_node(ax, x, y, label,
+def _draw_circle_node(ax, x, y, label=None,
                       radius=0.38,
                       face="#2563eb",
                       edge="#1e3a8a"):
@@ -588,7 +584,7 @@ def _draw_circle_node(ax, x, y, label,
         family="monospace", weight="bold"
     )
 
-def _draw_diamond_node(ax, x, y, label,
+def _draw_diamond_node(ax, x, y, label=None,
                        size=0.52,
                        face="#059669",
                        edge="#064e3b"):
@@ -648,9 +644,9 @@ def visualize_trie_matplotlib(
     for nid, label, is_term, call_ids in node_rows:
         x, y = pos[nid]
         if is_term:
-            _draw_diamond_node(ax, x, y, label)
+            _draw_diamond_node(ax, x, y)
         else:
-            _draw_circle_node(ax, x, y, label)
+            _draw_circle_node(ax, x, y)
 
         if call_ids:
             ax.text(
@@ -707,6 +703,30 @@ def run_pipeline(
     mappings = map_logs(log_rows, root, templates, min_static=min_static)
     return templates, root, mappings
 
+def load_dot_graph(dot_path: str) -> nx.MultiDiGraph:
+    graphs = pydot.graph_from_dot_file(dot_path)
+    if not graphs:
+        raise ValueError(f"Failed to parse DOT file: {dot_path}")
+
+    P = graphs[0]
+    G = nx.MultiDiGraph()
+
+    for node in P.get_nodes():
+        name = node.get_name()
+        if name in (None, "node", "graph", "edge"):
+            continue
+        nid = str(name).strip('"')
+        attrs = {k: v for k, v in node.get_attributes().items()}
+        G.add_node(nid, **attrs)
+
+    for edge in P.get_edges():
+        src = str(edge.get_source()).strip('"')
+        dst = str(edge.get_destination()).strip('"')
+        attrs = {k: v for k, v in edge.get_attributes().items()}
+        G.add_edge(src, dst, **attrs)
+
+    return G
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -715,16 +735,12 @@ def main() -> None:
     if len(sys.argv) > 1:
         dot_path = sys.argv[1]
 
-        if not PYDOT_OK:
-            print("ERROR: pydot is not installed. Run: pip install pydot")
-            sys.exit(1)
-
         if not Path(dot_path).exists():
             print(f"ERROR: file not found: {dot_path}")
             sys.exit(1)
 
         print(f"[CPG] Loading DOT: {dot_path}")
-        G = read_dot(dot_path)
+        G = load_dot_graph(dot_path)
         print(f"[CPG] nodes={G.number_of_nodes()} edges={G.number_of_edges()}")
 
     log_rows = [
