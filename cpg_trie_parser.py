@@ -3,6 +3,7 @@ cpg_trie_visualizer_matplotlib.py (ENHANCED WITH METHOD TRACKING)
 ==================================================================
 Builds Trie from CPG/PDG graph and visualizes it in PNG via matplotlib.
 
+
 ENHANCED FEATURES:
 - Tracks which METHOD each log statement belongs to
 - Outputs: Log -> Template -> Method mapping
@@ -11,9 +12,14 @@ ENHANCED FEATURES:
 - Deduplication of code segments
 - Removes leading wildcards, keeps trailing for variable matching
 
+FIXES:
+- _build_template: stops after first LITERAL block (no DDG-chain pollution)
+- _trie_match: prefix match — message can be prefix of template (trailing wildcards optional)
+
 Usage:
 ------
-python cpg_trie_parser.py export.dot
+python cpg_trie_visualizer_matplotlib.py export.dot trie.png
+
 
 Output Structure:
 -----------------
@@ -27,12 +33,15 @@ LogMapping now includes:
   - score: static token count
   - matched: bool
 
+
 Зависимости
 -----------
 pip install networkx matplotlib pydot
 """
 
+
 from __future__ import annotations
+
 
 import html
 import re
@@ -43,39 +52,51 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Optional
 
+
 import matplotlib.pyplot as plt
 import networkx as nx
 from matplotlib.patches import Circle, Polygon, PathPatch
 from matplotlib.path import Path as MplPath
 
+
 import pydot
+
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
+
 LOG_METHOD_NAMES: Set[str] = {
     # Java logging frameworks
     "info", "warn", "warning", "debug", "error", "trace", "fatal", "log",
-    
+
     # System output streams (for catching shutdown hooks, startup messages, etc.)
     "println",      # System.out.println(), System.err.println()
     "print",        # System.out.print(), System.err.print()
-    
+
+    # Go logrus / zap / zerolog
+    "infof", "warnf", "debugf", "errorf", "fatalf", "panicf",
+    "infoln", "warnln", "debugln", "errorln",
+    "printf",
+    "msg",
+    "msgf",
+
     # SLF4J / Logback
     "slf4j",
-    
+
     # Apache Commons Logging
     "commons",
-    
+
     # Log4j
     "log4j",
-    
+
     # Custom logger patterns
     "write",        # Writer.write()
-    "WriteLine"
+    "WriteLine",
     "flush",        # BufferedWriter.flush()
 }
+
 AST_LABEL = "AST"
 CALL_LABEL = "CALL"
 REACHING_DEF_LABEL = "REACHING_DEF"
@@ -87,9 +108,11 @@ LITERAL_LABELS: Set[str] = {
     "LITERAL", "STRING", "STRING_LITERAL", "NUMBER_LITERAL", "FIELD_IDENTIFIER",
 }
 
+
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class LogTemplate:
@@ -98,34 +121,41 @@ class LogTemplate:
     tokens: List[str]
     static_count: int
 
+
 @dataclass
 class TrieNode:
     children: Dict[str, "TrieNode"] = field(default_factory=dict)
     terminals: List[LogTemplate] = field(default_factory=list)
+
 
 @dataclass
 class LogMapping:
     bucket: str
     message: str
     call_node_id: str
-    method_name: str  # NEW: function/method name
-    method_node_id: str  # NEW: CPG METHOD node ID
+    method_name: str
+    method_node_id: str
     template: str
     score: int
     matched: bool
+
 
 # ---------------------------------------------------------------------------
 # Basic graph helpers
 # ---------------------------------------------------------------------------
 
+
 def _clean(v) -> str:
     return html.unescape(str(v).strip().strip('\"')).strip()
+
 
 def _label(G: nx.MultiDiGraph, nid) -> str:
     return _clean(G.nodes[nid].get("label", "")).upper()
 
+
 def _code(G: nx.MultiDiGraph, nid) -> str:
     return _clean(G.nodes[nid].get("CODE", ""))
+
 
 def _ast_children(G: nx.MultiDiGraph, nid) -> List:
     return [
@@ -133,12 +163,14 @@ def _ast_children(G: nx.MultiDiGraph, nid) -> List:
         if _clean(d.get("label", "")).upper() == AST_LABEL
     ]
 
+
 def _reaching_def_predecessors(G: nx.MultiDiGraph, nid) -> List[Tuple[str, str]]:
     out: List[Tuple[str, str]] = []
     for u, v, d in G.in_edges(nid, data=True):
         if _clean(d.get("label", "")).upper() == REACHING_DEF_LABEL:
             out.append((u, _clean(d.get("VARIABLE", ""))))
     return out
+
 
 def _normalize_code(s: str) -> str:
     s = str(s)
@@ -148,6 +180,7 @@ def _normalize_code(s: str) -> str:
     s = s.replace(r"\\", "\\")
     s = re.sub(r"\s+", " ", s)
     return s.strip().strip('\"').strip()
+
 
 def _arg_nodes(G: nx.MultiDiGraph, call_nid) -> List:
     args = []
@@ -167,12 +200,15 @@ def _arg_nodes(G: nx.MultiDiGraph, call_nid) -> List:
     args.sort(key=lambda x: x[0])
     return [v for _, v in args]
 
+
 def _tokenize(s: str) -> List[str]:
     return s.strip().split()
+
 
 # ---------------------------------------------------------------------------
 # FIND PARENT METHOD FOR LOG CALL
 # ---------------------------------------------------------------------------
+
 
 def _find_parent_method(G: nx.MultiDiGraph, call_node_id: str) -> Tuple[Optional[str], Optional[str]]:
     """
@@ -188,21 +224,21 @@ def _find_parent_method(G: nx.MultiDiGraph, call_node_id: str) -> Tuple[Optional
             continue
         visited.add(nid)
 
-        # Check if this is a METHOD node
         if _label(G, nid) == METHOD_LABEL:
             method_name = _clean(G.nodes[nid].get("NAME", ""))
             return (method_name, str(nid))
 
-        # Traverse incoming edges (parent nodes)
         for parent_id, _, edge_data in G.in_edges(nid, data=True):
             if parent_id not in visited:
                 queue.append(parent_id)
 
     return (None, None)
 
+
 # ---------------------------------------------------------------------------
 # SELECTIVE TEXT CLEANING (KEEPS HYPHENS)
 # ---------------------------------------------------------------------------
+
 
 def _clean_text_selective(text: str) -> str:
     """
@@ -214,25 +250,23 @@ def _clean_text_selective(text: str) -> str:
 
     text = str(text)
 
-    # Remove escape sequences
     text = text.replace(r'\\', ' ')
     text = text.replace(r'\"', ' ')
     text = text.replace(r"\'", ' ')
     text = text.replace(r'\/', ' ')
     text = re.sub(r'\[a-zA-Z]', ' ', text)
 
-    # Remove punctuation EXCEPT hyphens
     PUNCTUATION_TO_REMOVE = set(string.punctuation)
     PUNCTUATION_TO_REMOVE.discard('-')  # KEEP hyphens
 
     for p in PUNCTUATION_TO_REMOVE:
         text = text.replace(p, ' ')
 
-    # Normalize whitespace
     text = re.sub(r'\s+', ' ', text)
     text = text.strip()
     text = text.lower()
     return text
+
 
 def _normalize_code_selective(s: str) -> str:
     """Normalize CODE attributes with selective cleaning"""
@@ -241,9 +275,11 @@ def _normalize_code_selective(s: str) -> str:
     s = _clean_text_selective(s)
     return s
 
+
 # ---------------------------------------------------------------------------
 # Backward traversal over REACHING_DEF (OPTIMIZED)
 # ---------------------------------------------------------------------------
+
 
 def _backward_reaching_def(
     G: nx.MultiDiGraph,
@@ -274,13 +310,21 @@ def _backward_reaching_def(
 
     return result
 
+
 # ---------------------------------------------------------------------------
-# Build templates from CPG (WITH METHOD TRACKING)
+# FIX: Build template — stops after first LITERAL block (no DDG-chain pollution)
 # ---------------------------------------------------------------------------
+
 
 def _build_template(code_labels: List[Tuple[str, str, str]]) -> str:
     """
-    Build template with selective cleaning and deduplication.
+    Build template from the FIRST LITERAL block only.
+
+    FIX: stops traversal after finding the log message literal to avoid
+    DDG-chain pollution. Without this fix, REACHING_DEF edges pull in tokens
+    from sibling/predecessor nodes, turning 'request started <*>' into
+    'request started <*> session <*>' — which breaks trie matching.
+
     Removes leading wildcards, keeps trailing for variable matching.
     """
     if not code_labels:
@@ -292,6 +336,7 @@ def _build_template(code_labels: List[Tuple[str, str, str]]) -> str:
     parts: List[str] = []
     seen_codes: Set[str] = set()
     need_wildcard = False
+    found_literal = False  # FIX: track whether we've seen a literal
 
     for code, label, variable in code_labels:
         if not code or not code.strip():
@@ -316,7 +361,13 @@ def _build_template(code_labels: List[Tuple[str, str, str]]) -> str:
             words = code_clean.split()
             if words:
                 parts.extend(words)
+            found_literal = True
             continue
+
+        # FIX: stop after first literal — no more DDG pollution
+        if found_literal:
+            need_wildcard = True
+            break
 
         need_wildcard = True
 
@@ -333,6 +384,7 @@ def _build_template(code_labels: List[Tuple[str, str, str]]) -> str:
 
     return " ".join(merged).strip() if merged else ""
 
+
 @dataclass
 class LogTemplateWithMethod:
     call_node_id: str
@@ -341,6 +393,7 @@ class LogTemplateWithMethod:
     raw_template: str
     tokens: List[str]
     static_count: int
+
 
 def build_templates_from_cpg(
     G: nx.MultiDiGraph,
@@ -357,7 +410,6 @@ def build_templates_from_cpg(
         if call_name not in LOG_METHOD_NAMES:
             continue
 
-        # NEW: Find parent method
         method_name, method_node_id = _find_parent_method(G, nid)
         if not method_name:
             method_name = "unknown"
@@ -389,9 +441,11 @@ def build_templates_from_cpg(
 
     return templates
 
+
 # ---------------------------------------------------------------------------
 # Trie
 # ---------------------------------------------------------------------------
+
 
 def build_trie(templates: List[LogTemplateWithMethod]) -> TrieNode:
     root = TrieNode()
@@ -403,7 +457,6 @@ def build_trie(templates: List[LogTemplateWithMethod]) -> TrieNode:
             if key not in node.children:
                 node.children[key] = TrieNode()
             node = node.children[key]
-        # Store as LogTemplate for compatibility
         node.terminals.append(LogTemplate(
             call_node_id=tmpl.call_node_id,
             raw_template=tmpl.raw_template,
@@ -413,16 +466,38 @@ def build_trie(templates: List[LogTemplateWithMethod]) -> TrieNode:
 
     return root
 
+
 def _trie_match(
     node: TrieNode,
     msg: List[str],
     pos: int,
     results: List[LogTemplate],
 ) -> None:
+    """
+    FIX: Prefix match support.
+
+    If the message ends but the template has only wildcard edges remaining,
+    still count it as a match. This fixes cases where DDG pollution added
+    extra tokens to the template (e.g. 'request started <*> session <*>')
+    but the actual log message is simply 'request started'.
+    """
     if pos == len(msg):
+        # Standard terminal match
         results.extend(node.terminals)
+        # FIX: prefix match — collect terminals reachable only via wildcards
+        queue = []
         if WILDCARD in node.children:
-            results.extend(node.children[WILDCARD].terminals)
+            queue.append(node.children[WILDCARD])
+        seen = set()
+        while queue:
+            n = queue.pop()
+            nid = id(n)
+            if nid in seen:
+                continue
+            seen.add(nid)
+            results.extend(n.terminals)
+            if WILDCARD in n.children:
+                queue.append(n.children[WILDCARD])
         return
 
     tok = msg[pos].lower()
@@ -435,6 +510,7 @@ def _trie_match(
         for end in range(pos + 1, len(msg) + 1):
             _trie_match(wc, msg, end, results)
 
+
 def map_logs(
     log_rows: List[Tuple[str, str]],
     root: TrieNode,
@@ -444,7 +520,6 @@ def map_logs(
     """Map logs to templates and include method information"""
     mappings: List[LogMapping] = []
 
-    # Build lookup: call_node_id -> (method_name, method_node_id)
     method_lookup: Dict[str, Tuple[str, str]] = {}
     for tmpl in templates_with_methods:
         method_lookup[tmpl.call_node_id] = (tmpl.method_name, tmpl.method_node_id)
@@ -487,9 +562,11 @@ def map_logs(
 
     return mappings
 
+
 # ---------------------------------------------------------------------------
 # Trie visualization
 # ---------------------------------------------------------------------------
+
 
 def _trie_bfs(root: TrieNode):
     counter = [0]
@@ -508,6 +585,7 @@ def _trie_bfs(root: TrieNode):
         for key, child in trie_node.children.items():
             cid = new_id()
             queue.append((child, cid, nid, key))
+
 
 def _tree_layout(
     edges: List[Tuple[int, int]],
@@ -553,6 +631,7 @@ def _tree_layout(
 
     return pos
 
+
 def _draw_curved_edge(ax, x0, y0, x1, y1, color="#93c5fd", lw=1.8):
     verts = [
         (x0, y0),
@@ -570,6 +649,7 @@ def _draw_curved_edge(ax, x0, y0, x1, y1, color="#93c5fd", lw=1.8):
     patch = PathPatch(path, facecolor="none", edgecolor=color, lw=lw)
     ax.add_patch(patch)
 
+
 def _draw_circle_node(ax, x, y, label=None,
                       radius=0.38,
                       face="#2563eb",
@@ -583,6 +663,7 @@ def _draw_circle_node(ax, x, y, label=None,
         fontsize=8.5, color="white",
         family="monospace", weight="bold"
     )
+
 
 def _draw_diamond_node(ax, x, y, label=None,
                        size=0.52,
@@ -603,6 +684,7 @@ def _draw_diamond_node(ax, x, y, label=None,
         fontsize=8.5, color="white",
         family="monospace", weight="bold"
     )
+
 
 def visualize_trie_matplotlib(
     root: TrieNode,
@@ -686,9 +768,11 @@ def visualize_trie_matplotlib(
 
     print(f"[Trie] Saved matplotlib PNG -> {output_path}")
 
+
 # ---------------------------------------------------------------------------
 # Pipeline
 # ---------------------------------------------------------------------------
+
 
 def run_pipeline(
     G: nx.MultiDiGraph,
@@ -702,6 +786,7 @@ def run_pipeline(
     visualize_trie_matplotlib(root, output_path=trie_image)
     mappings = map_logs(log_rows, root, templates, min_static=min_static)
     return templates, root, mappings
+
 
 def load_dot_graph(dot_path: str) -> nx.MultiDiGraph:
     graphs = pydot.graph_from_dot_file(dot_path)
@@ -727,21 +812,27 @@ def load_dot_graph(dot_path: str) -> nx.MultiDiGraph:
 
     return G
 
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
+
 def main() -> None:
-    if len(sys.argv) > 1:
-        dot_path = sys.argv[1]
+    if len(sys.argv) < 3:
+        print("Usage: python cpg_trie_visualizer_matplotlib.py <export.dot> <trie.png>")
+        sys.exit(1)
 
-        if not Path(dot_path).exists():
-            print(f"ERROR: file not found: {dot_path}")
-            sys.exit(1)
+    dot_path = sys.argv[1]
+    image_path = sys.argv[2]
 
-        print(f"[CPG] Loading DOT: {dot_path}")
-        G = load_dot_graph(dot_path)
-        print(f"[CPG] nodes={G.number_of_nodes()} edges={G.number_of_edges()}")
+    if not Path(dot_path).exists():
+        print(f"ERROR: file not found: {dot_path}")
+        sys.exit(1)
+
+    print(f"[CPG] Loading DOT: {dot_path}")
+    G = load_dot_graph(dot_path)
+    print(f"[CPG] nodes={G.number_of_nodes()} edges={G.number_of_edges()}")
 
     log_rows = [
         ("b1", '"received ad request (context_words=[clothing, tops])"'),
@@ -750,7 +841,7 @@ def main() -> None:
     templates, root, mappings = run_pipeline(
         G,
         log_rows,
-        trie_image="trie.png",
+        trie_image=image_path,
         max_ddg_depth=5,
         min_static=1,
     )
@@ -777,6 +868,7 @@ def main() -> None:
                 print(f"    Status: UNMATCHED")
 
     print("\nDone. Trie image saved as: trie.png")
+
 
 if __name__ == "__main__":
     main()
