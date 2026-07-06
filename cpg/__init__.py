@@ -13,6 +13,7 @@ from cpg.method    import MethodConstructor, CallSite, print_method_graph, Pseud
 from cpg.flow import EndpointFlow, print_endpoint_flow, print_paths_summary
 from cpg.visual import show_flowchart
 from cpg.endpoint  import Endpoint, EndpointDetector, print_endpoints
+from cpg.tracer import LogToHandlerTracer, LogTraceResult, ExecutionPath, CallStep, trace_single_log, print_trace_result
 
 __all__ = [
     "DEFAULT_PROJECT_PREFIXES",
