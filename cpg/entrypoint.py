@@ -1,27 +1,21 @@
 import html
 
-from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, List, Tuple
 
 import networkx as nx
 
 @dataclass
-class Endpoint:
+class Entrypoint:
     node_id:    str
     name:       str
     full_name:  str
     filename:   str
-    # call-graph metrics
-    in_degree:  int = 0   # always 0 for an endpoint, kept for transparency
-    out_degree: int = 0   # fan-out: how many distinct internal methods it calls
-    # raw callee names (for inspection)
-    callees: List[str] = field(default_factory=list)
 
 
-class EndpointDetector:
+class EntrypointDetector:
     """
-    Detects structural endpoints using call-graph topology only.
+    Detects structural entrypoints using call-graph topology only.
 
     Parameters
     ----------
@@ -34,13 +28,13 @@ class EndpointDetector:
 
     # ── public API ────────────────────────────────────────────────────────────
 
-    def detect(self) -> List[Endpoint]:
+    def detect(self) -> List[Entrypoint]:
         """
-        Returns endpoints sorted descending by out_degree (fan-out).
+        Returns entrypoints sorted descending by out_degree (fan-out).
         """
         internal   = self._collect_internal_methods()
         call_graph = self._build_call_graph(internal)
-        return self._select_endpoints(internal, call_graph)
+        return self._select_entrypoints(internal, call_graph)
 
     # ── CPG attribute access ──────────────────────────────────────────────────
 
@@ -124,13 +118,13 @@ class EndpointDetector:
 
     # ── selection: in_degree = 0  AND  out_degree ≥ 1 ────────────────────────
 
-    def _select_endpoints(
+    def _select_entrypoints(
         self,
         internal: Dict[str, dict],
         cg: nx.DiGraph,
-    ) -> List[Endpoint]:
+    ) -> List[Entrypoint]:
 
-        result: List[Endpoint] = []
+        result: List[Entrypoint] = []
         for nid in cg.nodes:
             in_d  = cg.in_degree(nid)
             out_d = cg.out_degree(nid)
@@ -139,41 +133,11 @@ class EndpointDetector:
             if in_d != 0 or out_d < 1:
                 continue
 
-            callees = [
-                self._attr(v, "NAME")
-                for v in cg.successors(nid)
-            ]
-
-            result.append(Endpoint(
+            result.append(Entrypoint(
                 node_id    = nid,
                 name       = self._attr(nid, "NAME"),
                 full_name  = self._attr(nid, "FULL_NAME"),
                 filename   = self._attr(nid, "FILENAME"),
-                in_degree  = in_d,
-                out_degree = out_d,
-                callees    = sorted(callees),
             ))
 
-        return sorted(result, key=lambda e: -e.out_degree)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Pretty printer
-# ─────────────────────────────────────────────────────────────────────────────
-
-def print_endpoints(endpoints: List[Endpoint], max_fn: int = 60) -> None:
-    print(f"\n{'─'*72}")
-    print(f"  Structural Endpoints detected: {len(endpoints)}")
-    print(f"  Criterion: in_degree=0  ∧  out_degree≥1  in internal call graph")
-    print(f"{'─'*72}")
-    header = f"  {'rank':>4}  {'out_deg':>7}  {'name':28s}  full_name"
-    print(header)
-    print(f"  {'─'*4}  {'─'*7}  {'─'*28}  {'─'*max_fn}")
-    for rank, ep in enumerate(endpoints, 1):
-        print(
-            f"  {rank:>4}  {ep.out_degree:>7}  {ep.name:28s}  "
-            f"{ep.full_name[:max_fn]}"
-        )
-        print(f"         {'':>7}  callees: {', '.join(ep.callees[:6])}"
-              + (" …" if len(ep.callees) > 6 else ""))
-    print(f"{'─'*72}\n")
+        return result

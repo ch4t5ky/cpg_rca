@@ -1,14 +1,14 @@
 """
-EndpointFlow — разворачивает полную последовательность вызовов от METHOD-узла
+EntrypointFlow — разворачивает полную последовательность вызовов от METHOD-узла
 в CFG-порядке выполнения с учётом всех путей (if/else, циклы, ранний return).
 
 Алгоритм
 ────────
 1. _build_fn_index   : собирает FULL_NAME → node_id для всех внутренних
                        METHOD-узлов CPG (совместимость Joern 0.x / 1.x).
-2. build(node_id)    : создаёт EndpointFlowResult и запускает _expand от корня.
+2. build(node_id)    : создаёт EntrypointFlowResult и запускает _expand от корня.
 3. build_by_name     : то же, но поиск по короткому NAME.
-4. all_endpoints()   : возвращает методы с indegree=0 в call-graph.
+4. all_entrypoints()   : возвращает методы с indegree=0 в call-graph.
 5. _expand           : рекурсивный обход цепочки вызовов.
    • _build_cfg_paths(mg) строит все пути через CFG метода:
      - линейный участок   → один PathSegment
@@ -35,9 +35,9 @@ __all__ = [
     "MethodPath",
     "MethodEntry",
     "ExternalCall",
-    "EndpointFlowResult",
-    "EndpointFlow",
-    "print_endpoint_flow",
+    "EntrypointFlowResult",
+    "EntrypointFlow",
+    "print_entrypoint_flow",
 ]
 
 
@@ -109,8 +109,8 @@ class MethodPath:
 
     def summary(self) -> str:
         lines = [
-            f"endpoint       : {self.endpoint_name}",
-            f"full name      : {self.endpoint_full_name}",
+            f"entrypoint       : {self.entrypoint_name}",
+            f"full name      : {self.entrypoint_full_name}",
             f"invocations    : {self.total_invocations}",
             f"unique methods : {len(self.unique_methods)}",
             f"external calls : {len(self.external_calls)}",
@@ -152,11 +152,11 @@ class ExternalCall:
 
 
 @dataclass
-class EndpointFlowResult:
-    """Полная развёрнутая цепочка вызовов одного endpoint-а."""
-    endpoint_node_id:   str
-    endpoint_name:      str
-    endpoint_full_name: str
+class EntrypointFlowResult:
+    """Полная развёрнутая цепочка вызовов одного entrypoint-а."""
+    entrypoint_node_id:   str
+    entrypoint_name:      str
+    entrypoint_full_name: str
     sequence:           List[MethodEntry]           = field(default_factory=list)
     external_calls:     List[ExternalCall]          = field(default_factory=list)
     cycle_warnings:     List[str]                   = field(default_factory=list)
@@ -174,8 +174,8 @@ class EndpointFlowResult:
 
     def summary(self) -> str:
         lines = [
-            f"endpoint       : {self.endpoint_name}",
-            f"full name      : {self.endpoint_full_name}",
+            f"entrypoint       : {self.entrypoint_name}",
+            f"full name      : {self.entrypoint_full_name}",
             f"invocations    : {self.total_invocations}",
             f"unique methods : {len(self.unique_methods)}",
             f"external calls : {len(self.external_calls)}",
@@ -192,11 +192,11 @@ class EndpointFlowResult:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# EndpointFlow
+# EntrypointFlow
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-class EndpointFlow:
+class EntrypointFlow:
     """
     Строит полную развёрнутую последовательность вызовов от METHOD-узла
     в порядке выполнения CFG, с учётом всех путей через каждый метод.
@@ -214,15 +214,16 @@ class EndpointFlow:
 
     Usage
     ─────
-        flow = EndpointFlow(G, max_depth=10)
+        flow = EntrypointFlow
+    (G, max_depth=10)
 
         result = flow.build("107374182770")
         print(result.summary())
 
         result = flow.build_by_name("viewCartHandler")
-        print_endpoint_flow(result, show_paths=True)
+        print_entrypoint_flow(result, show_paths=True)
 
-        for nid in flow.all_endpoints():
+        for nid in flow.all_entrypoints():
             r = flow.build(nid)
             print(r.summary())
     """
@@ -244,14 +245,14 @@ class EndpointFlow:
 
     # ── public ────────────────────────────────────────────────────────────────
 
-    def build(self, endpoint_node_id: str) -> EndpointFlowResult:
-        """Строит EndpointFlowResult по node_id METHOD-узла."""
-        full_name = _node_attr(self._G, endpoint_node_id, "FULLNAME", "FULL_NAME")
-        name      = _node_attr(self._G, endpoint_node_id, "NAME")
-        result = EndpointFlowResult(
-            endpoint_node_id   = endpoint_node_id,
-            endpoint_name      = name,
-            endpoint_full_name = full_name,
+    def build(self, entrypoint_node_id: str) -> EntrypointFlowResult:
+        """Строит EntrypointFlowResult по node_id METHOD-узла."""
+        full_name = _node_attr(self._G, entrypoint_node_id, "FULLNAME", "FULL_NAME")
+        name      = _node_attr(self._G, entrypoint_node_id, "NAME")
+        result = EntrypointFlowResult(
+            entrypoint_node_id   = entrypoint_node_id,
+            entrypoint_name      = name,
+            entrypoint_full_name = full_name,
         )
         self._expand(
             full_name        = full_name,
@@ -264,8 +265,8 @@ class EndpointFlow:
         )
         return result
 
-    def build_by_name(self, name: str) -> Optional[EndpointFlowResult]:
-        """Строит EndpointFlowResult по короткому имени метода."""
+    def build_by_name(self, name: str) -> Optional[EntrypointFlowResult]:
+        """Строит EntrypointFlowResult по короткому имени метода."""
         candidates = self._name_index.get(name)
         if not candidates:
             return None
@@ -279,7 +280,7 @@ class EndpointFlow:
         depth:            int,
         counter:          List[int],
         in_stack:         Set[str],
-        result:           EndpointFlowResult,
+        result:           EntrypointFlowResult,
         caller_full_name: str,
         via_path:         Optional[MethodPath],
     ) -> None:
@@ -617,8 +618,8 @@ class EndpointFlow:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-def print_endpoint_flow(
-    result:         EndpointFlowResult,
+def print_entrypoint_flow(
+    result:         EntrypointFlowResult,
     show_cfg:       bool = False,
     show_paths:     bool = False,
     show_external:  bool = False,
@@ -627,7 +628,7 @@ def print_endpoint_flow(
     max_path_nodes: int  = 8,
 ) -> None:
     """
-    Вывод EndpointFlowResult в stdout.
+    Вывод EntrypointFlowResult в stdout.
 
     show_cfg      : первые max_cfg_nodes узлов CFG для каждого метода
     show_paths    : все пути каждого метода с CFG-узлами
@@ -637,8 +638,8 @@ def print_endpoint_flow(
     """
     w = 72
     print(f"\n{'═' * w}")
-    print(f"  ENDPOINT FLOW  {result.endpoint_name}")
-    print(f"  {result.endpoint_full_name}")
+    print(f"  entrypoint FLOW  {result.entrypoint_name}")
+    print(f"  {result.entrypoint_full_name}")
     print(f"  Invocations    : {result.total_invocations}")
     print(f"  Unique methods : {len(result.unique_methods)}")
     print(f"  External calls : {len(result.external_calls)}")
@@ -726,7 +727,7 @@ def print_endpoint_flow(
 
     print(f"{'═' * w}\n")
 
-def print_paths_summary(result: EndpointFlowResult, method_full_name: str) -> None:
+def print_paths_summary(result: EntrypointFlowResult, method_full_name: str) -> None:
     paths = result.method_paths.get(method_full_name, [])
     if not paths:
         print(f"No paths for {method_full_name}")
