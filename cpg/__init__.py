@@ -11,7 +11,7 @@ from cpg.constants import DEFAULT_PROJECT_PREFIXES
 from cpg.graph     import CodePropertyGraph
 from cpg.method    import MethodConstructor, CallSite, print_method_graph, PseudocodeGenerator
 from cpg.flow import EntrypointFlowResult, EntrypointFlow
-from cpg.entrypoint  import Entrypoint, EntrypointDetector, print_endpoints
+from cpg.entrypoint  import Entrypoint, EntrypointDetector
 
 __all__ = [
     "DEFAULT_PROJECT_PREFIXES",

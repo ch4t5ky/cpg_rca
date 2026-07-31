@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 from cpg.flow import EntrypointFlowResult, MethodPath, MethodEntry, ExternalCall
-from cpg_trie_parser import LogTemplateWithMethod
+from cpg.cpg_trie_parser import LogTemplateWithMethod
 
 START = "__start__"
 RETURN = "__return__"
