@@ -88,6 +88,15 @@ def load_cpg(dot_path: Path) -> nx.MultiDiGraph:
     return graph
 
 
+def _json_default(value: Any):
+    if hasattr(value, "value") and hasattr(type(value), "__members__"):
+        return value.value
+    if isinstance(value, set):
+        return sorted(value)
+    if isinstance(value, Path):
+        return str(value)
+    raise TypeError(f"Cannot serialize type {type(value).__name__}")
+
 # --------------------------------------------------------------------------- #
 # Log Trie
 # --------------------------------------------------------------------------- #
@@ -100,7 +109,6 @@ def serialize_trie_node(node) -> dict:
             token: serialize_trie_node(child) for token, child in node.children.items()
         },
     }
-
 
 def build_log_trie(graph: nx.MultiDiGraph, output_dir: Path, max_ddg_depth: int = 5):
     """Строит лог-шаблоны и Trie, сохраняет визуализацию (trie.png) и данные (trie.json)."""
@@ -129,16 +137,6 @@ def build_log_trie(graph: nx.MultiDiGraph, output_dir: Path, max_ddg_depth: int 
 # --------------------------------------------------------------------------- #
 # Сериализация FLOW / FSM
 # --------------------------------------------------------------------------- #
-
-def _json_default(value: Any):
-    if hasattr(value, "value") and hasattr(type(value), "__members__"):
-        return value.value
-    if isinstance(value, set):
-        return sorted(value)
-    if isinstance(value, Path):
-        return str(value)
-    raise TypeError(f"Cannot serialize type {type(value).__name__}")
-
 
 def serialize_flow(flow_result) -> dict:
     return {
@@ -177,7 +175,6 @@ def serialize_flow(flow_result) -> dict:
         },
     }
 
-
 def serialize_fsm(fsm) -> dict:
     return {
         "entrypoint_node_id": fsm.entrypoint_node_id,
@@ -191,7 +188,6 @@ def serialize_fsm(fsm) -> dict:
         "transitions": [asdict(edge) for edge in fsm.transitions],
     }
 
-
 def _safe_name(value: str) -> str:
     return (
         value.replace("/", "_")
@@ -201,7 +197,6 @@ def _safe_name(value: str) -> str:
         .replace("<", "_")
         .replace(">", "_")
     )
-
 
 # --------------------------------------------------------------------------- #
 # FLOW + FSM для всех entrypoint'ов сервиса
