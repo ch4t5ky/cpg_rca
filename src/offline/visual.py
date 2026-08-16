@@ -1,7 +1,7 @@
 import os
 import textwrap
 import graphviz
-from cpg.log_flow import StaticLogFSM
+from src.offline.finite_state_machine import StaticLogFSM
 from typing import Dict, List, Tuple, Any
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
@@ -794,7 +794,7 @@ def export_results(results: pd.DataFrame, active_chains: Dict[int, Any], output_
         "json": str(json_path),
     }
 
-from cpg.flow import SemanticUnit, SemanticUnitKind
+from src.offline.flow import SemanticUnit, SemanticUnitKind
 
 
 @dataclass
@@ -953,7 +953,7 @@ def draw_semantic_flow_graphviz(
     name = filename or (method_graph.name or "semantic_flow")
     return graph.render(filename=name, directory=output_dir, cleanup=True)
 
-from cpg.flow import SemanticFlowGraph, SemanticUnit, SemanticUnitKind
+from src.offline.flow import SemanticFlowGraph, SemanticUnit, SemanticUnitKind
 
 
 def draw_semantic_graph_graphviz(
@@ -1146,3 +1146,113 @@ def draw_semantic_graph_graphviz(
         directory=output_dir,
         cleanup=True,
     )
+
+from src.offline.finite_state_machine import StaticLogFSM
+
+_KIND_STYLE = {
+    "START_SEGMENT": {"fillcolor": "#059669", "fontcolor": "white"},       # green
+    "BETWEEN_LOGS": {"fillcolor": "#2563eb", "fontcolor": "white"},        # blue
+    "RETURN_SEGMENT": {"fillcolor": "#7c3aed", "fontcolor": "white"},      # purple
+    "INCOMPLETE_SEGMENT": {"fillcolor": "#dc2626", "fontcolor": "white"},  # red
+}
+
+_MAX_LABEL_METHODS = 4
+_MAX_LABEL_CHARS = 60
+
+
+def _safe_id(raw_id: str) -> str:
+    """Graphviz-safe node id — no ':' (which .edge() misparses as a port)."""
+    return raw_id.replace(":", "_").replace(" ", "_")
+
+
+def _truncate(text: str, limit: int = _MAX_LABEL_CHARS) -> str:
+    text = text or ""
+    return text if len(text) <= limit else text[: limit - 1] + "…"
+
+
+def _state_label(state) -> str:
+    lines = [state.id, state.kind]
+
+    methods = list(state.direct_methods) + list(state.external_calls)
+    if methods:
+        shown = [m.rsplit(".", 1)[-1] for m in methods[:_MAX_LABEL_METHODS]]
+        suffix = ", ..." if len(methods) > _MAX_LABEL_METHODS else ""
+        lines.append(_truncate(", ".join(shown) + suffix))
+
+    if state.conditions:
+        lines.append(_truncate("if: " + " | ".join(state.conditions), 50))
+
+    return "\n".join(lines)
+
+
+def _edge_label(transition) -> str:
+    template = _truncate(transition.template, 45)
+    if transition.static_score:
+        return f"{template}\n(score={transition.static_score})"
+    return template
+
+
+def draw_log_fsm_graphviz(
+    fsm: StaticLogFSM,
+    filename: str = "log_fsm",
+    output_dir: str = "output",
+    fmt: str = "png",
+    rankdir: str = "LR",
+    show_warnings: bool = True,
+) -> str:
+    """Render a StaticLogFSM to disk with graphviz and return the file path."""
+
+    out_dir = Path(output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    graph_label = fsm.summary()
+    if show_warnings and fsm.warnings:
+        graph_label += "\\n" + "\\n".join(f"WARNING: {w}" for w in fsm.warnings)
+
+    dot = graphviz.Digraph(
+        name=filename,
+        format=fmt,
+        graph_attr={
+            "rankdir": rankdir,
+            "label": graph_label,
+            "labelloc": "t",
+            "fontsize": "11",
+            "fontname": "Helvetica",
+            "bgcolor": "white",
+        },
+        node_attr={
+            "shape": "box",
+            "style": "rounded,filled",
+            "fontname": "Helvetica",
+            "fontsize": "10",
+        },
+        edge_attr={
+            "fontname": "Helvetica",
+            "fontsize": "9",
+            "color": "#6b7280",
+        },
+    )
+
+    start_ids = fsm.start_states
+    terminal_ids = fsm.terminals
+
+    for state_id, state in fsm.states.items():
+        style = dict(_KIND_STYLE.get(state.kind, {"fillcolor": "#94a3b8", "fontcolor": "black"}))
+        peripheries = "2" if (state_id in start_ids or state_id in terminal_ids) else "1"
+        dot.node(
+            _safe_id(state_id),
+            label=_state_label(state),
+            fillcolor=style["fillcolor"],
+            fontcolor=style["fontcolor"],
+            peripheries=peripheries,
+        )
+
+    for transition in fsm.transitions:
+        dot.edge(
+            _safe_id(transition.source_segment_id),
+            _safe_id(transition.target_segment_id),
+            label=_edge_label(transition),
+        )
+
+    rendered_path: str = dot.render(filename=filename, directory=str(out_dir), cleanup=True)
+    return rendered_path

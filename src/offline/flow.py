@@ -14,7 +14,7 @@ from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 import networkx as nx
 
-from cpg.method import CfgNode, MethodConstructor, MethodGraph
+from src.offline.method import CfgNode, MethodConstructor, MethodGraph
 
 __all__ = [
     "SemanticUnitKind", "VariableKind", "VariableRef", "DataDependency",
@@ -745,3 +745,4 @@ def print_entrypoint_flow(
         for call in result.external_calls:
             print(f"  {call.caller_full_name} → {call.callee_full_name} L{call.line} {call.call_code}")
     print("═" * 76)
+
