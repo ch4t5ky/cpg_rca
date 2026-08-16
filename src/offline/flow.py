@@ -9,14 +9,23 @@ import networkx as nx
 from src.offline.method import CfgNode, MethodConstructor, MethodGraph
 
 __all__ = [
-    "SemanticUnitKind", "VariableKind", "VariableRef", "DataDependency",
-    "SemanticUnit", "SemanticEdge", "SemanticFlowGraph", "MethodEntry",
-    "ExternalCall", "EntrypointFlowResult", "EntrypointFlow",
+    "SemanticUnitKind",
+    "VariableKind",
+    "VariableRef",
+    "DataDependency",
+    "SemanticUnit",
+    "SemanticEdge",
+    "SemanticFlowGraph",
+    "MethodEntry",
+    "ExternalCall",
+    "EntrypointFlowResult",
+    "EntrypointFlow",
     "print_entrypoint_flow",
 ]
 
 
 # ── helpers ───────────────────────────────────────────────────────────────
+
 
 def _clean(raw: object) -> str:
     value = html.unescape(str(raw)).strip()
@@ -179,7 +188,9 @@ class EntrypointFlowResult:
             f"external calls : {len(self.external_calls)}",
         ]
         if self.cycle_warnings:
-            lines.append(f"recursive calls skipped : {', '.join(sorted(set(self.cycle_warnings)))}")
+            lines.append(
+                f"recursive calls skipped : {', '.join(sorted(set(self.cycle_warnings)))}"
+            )
         if self.max_depth_reached:
             lines.append("max_depth reached — callees were not expanded further")
         return "\n".join(lines)
@@ -196,10 +207,16 @@ class EntrypointFlow:
     compatible construction calls and have no effect on graph construction.
     """
 
-    _SEMANTIC_ANCHOR_LABELS = frozenset({
-        "CALL", "LOCAL", "RETURN", "METHOD_RETURN", "CONTROL_STRUCTURE",
-        "JUMP_TARGET",
-    })
+    _SEMANTIC_ANCHOR_LABELS = frozenset(
+        {
+            "CALL",
+            "LOCAL",
+            "RETURN",
+            "METHOD_RETURN",
+            "CONTROL_STRUCTURE",
+            "JUMP_TARGET",
+        }
+    )
     _LOOP_TYPES = frozenset({"WHILE", "FOR", "DO"})
 
     def __init__(
@@ -242,7 +259,9 @@ class EntrypointFlow:
                 callee = call.method_full_name
                 if callee in incoming and callee != full_name:
                     incoming[callee] += 1
-        return [self._fn_index[name] for name, degree in incoming.items() if degree == 0]
+        return [
+            self._fn_index[name] for name, degree in incoming.items() if degree == 0
+        ]
 
     # ── interprocedural discovery ───────────────────────────────────────
 
@@ -273,13 +292,15 @@ class EntrypointFlow:
         method = self._mc.build(method_node_id)
         semantic_graph = self._build_semantic_graph(method)
         result.semantic_graphs[full_name] = semantic_graph
-        result.sequence.append(MethodEntry(
-            method_graph=method,
-            depth=depth,
-            call_index=counter[0],
-            caller_full_name=caller_full_name,
-            via_call_node_id=via_call_node_id,
-        ))
+        result.sequence.append(
+            MethodEntry(
+                method_graph=method,
+                depth=depth,
+                call_index=counter[0],
+                caller_full_name=caller_full_name,
+                via_call_node_id=via_call_node_id,
+            )
+        )
         counter[0] += 1
         expanded.add(full_name)
         in_stack.add(full_name)
@@ -290,18 +311,26 @@ class EntrypointFlow:
                 continue
             if callee in self._fn_index:
                 self._expand_method(
-                    callee, depth + 1, counter, in_stack, expanded, result,
-                    full_name, call.node_id,
+                    callee,
+                    depth + 1,
+                    counter,
+                    in_stack,
+                    expanded,
+                    result,
+                    full_name,
+                    call.node_id,
                 )
             else:
-                result.external_calls.append(ExternalCall(
-                    caller_full_name=full_name,
-                    callee_full_name=callee,
-                    call_code=call.code,
-                    line=call.line,
-                    depth=depth,
-                    call_index=counter[0],
-                ))
+                result.external_calls.append(
+                    ExternalCall(
+                        caller_full_name=full_name,
+                        callee_full_name=callee,
+                        call_code=call.code,
+                        line=call.line,
+                        depth=depth,
+                        call_index=counter[0],
+                    )
+                )
                 counter[0] += 1
 
         in_stack.discard(full_name)
@@ -353,11 +382,19 @@ class EntrypointFlow:
             if label == "JUMP_TARGET":
                 return SemanticUnitKind.JUMP
             if label == "CONTROL_STRUCTURE":
-                control_type = _node_attr(self._G, anchor_id, "CONTROL_STRUCTURE_TYPE").upper()
-                return SemanticUnitKind.LOOP if control_type in self._LOOP_TYPES else SemanticUnitKind.CONDITION
+                control_type = _node_attr(
+                    self._G, anchor_id, "CONTROL_STRUCTURE_TYPE"
+                ).upper()
+                return (
+                    SemanticUnitKind.LOOP
+                    if control_type in self._LOOP_TYPES
+                    else SemanticUnitKind.CONDITION
+                )
             if label == "CALL":
                 name = _node_attr(self._G, anchor_id, "NAME")
-                if name.startswith("<operator>.assignment") or name.endswith(".assignment"):
+                if name.startswith("<operator>.assignment") or name.endswith(
+                    ".assignment"
+                ):
                     return SemanticUnitKind.ASSIGNMENT
                 return SemanticUnitKind.CALL
             return SemanticUnitKind.UNKNOWN
@@ -365,19 +402,25 @@ class EntrypointFlow:
         # Variable identities.
         references: Dict[str, VariableRef] = {}
         for local in method.local_vars:
-            references.setdefault(local.name, VariableRef(
-                name=local.name,
-                declaration_node_id=local.node_id,
-                type_full_name=local.type_full_name,
-                kind=VariableKind.LOCAL,
-            ))
+            references.setdefault(
+                local.name,
+                VariableRef(
+                    name=local.name,
+                    declaration_node_id=local.node_id,
+                    type_full_name=local.type_full_name,
+                    kind=VariableKind.LOCAL,
+                ),
+            )
         for parameter in method.parameters:
-            references.setdefault(parameter.name, VariableRef(
-                name=parameter.name,
-                declaration_node_id=parameter.node_id,
-                type_full_name=parameter.type_full_name,
-                kind=VariableKind.PARAMETER,
-            ))
+            references.setdefault(
+                parameter.name,
+                VariableRef(
+                    name=parameter.name,
+                    declaration_node_id=parameter.node_id,
+                    type_full_name=parameter.type_full_name,
+                    kind=VariableKind.PARAMETER,
+                ),
+            )
 
         def variable_ref(name: str) -> VariableRef:
             return references.get(name, VariableRef(name=name))
@@ -402,11 +445,13 @@ class EntrypointFlow:
             variable = variable_ref(pdg_edge.variable)
             defs_by_anchor[anchor(pdg_edge.src)].append(variable)
             uses_by_anchor[anchor(pdg_edge.dst)].append(variable)
-            deps_by_anchor[anchor(pdg_edge.dst)].append(DataDependency(
-                variable=variable,
-                definition_node_id=pdg_edge.src,
-                use_node_id=pdg_edge.dst,
-            ))
+            deps_by_anchor[anchor(pdg_edge.dst)].append(
+                DataDependency(
+                    variable=variable,
+                    definition_node_id=pdg_edge.src,
+                    use_node_id=pdg_edge.dst,
+                )
+            )
 
         call_sites_by_anchor: Dict[str, List[object]] = defaultdict(list)
         for call in method.call_sites:
@@ -429,7 +474,9 @@ class EntrypointFlow:
             code = _clean(data.get("CODE", ""))
             if not code:
                 code = max((node.code for node in raw_nodes), key=len, default="")
-            line = _clean(data.get("LINE_NUMBER", "")) or (raw_nodes[0].line if raw_nodes else "")
+            line = _clean(data.get("LINE_NUMBER", "")) or (
+                raw_nodes[0].line if raw_nodes else ""
+            )
             calls = call_sites_by_anchor.get(anchor_id, [])
             callees = [call.method_full_name for call in calls if call.method_full_name]
             internal = [callee for callee in callees if callee in self._fn_index]
@@ -471,9 +518,13 @@ class EntrypointFlow:
         represented_for_raw: Dict[str, Optional[str]] = {}
         for raw_node_id in raw_cfg.nodes:
             anchor_id = anchor(raw_node_id)
-            represented_for_raw[raw_node_id] = anchor_id if anchor_id in graph.nodes else None
+            represented_for_raw[raw_node_id] = (
+                anchor_id if anchor_id in graph.nodes else None
+            )
 
-        def normalize_condition(source_id: str, target_id: str, raw_condition: str) -> str:
+        def normalize_condition(
+            source_id: str, target_id: str, raw_condition: str
+        ) -> str:
             source = graph.nodes.get(source_id)
             target = graph.nodes.get(target_id)
             if source and source.kind == SemanticUnitKind.LOOP:
@@ -481,7 +532,11 @@ class EntrypointFlow:
                     return "body"
                 if raw_condition == "LOOP_FALSE":
                     return f"exit: not ({source.code})" if source.code else "exit"
-            if target and target.kind == SemanticUnitKind.LOOP and raw_condition in {"", "LOOP_BODY", "LOOP_TRUE"}:
+            if (
+                target
+                and target.kind == SemanticUnitKind.LOOP
+                and raw_condition in {"", "LOOP_BODY", "LOOP_TRUE"}
+            ):
                 return "next iteration"
             if raw_condition == "LOOP_BODY":
                 return "next iteration"
@@ -494,7 +549,9 @@ class EntrypointFlow:
                 continue
             queue = deque()
             for successor in raw_cfg.successors(source_raw):
-                raw_condition = raw_cfg.edges[source_raw, successor].get("condition", "")
+                raw_condition = raw_cfg.edges[source_raw, successor].get(
+                    "condition", ""
+                )
                 queue.append((successor, raw_condition))
             visited: Set[Tuple[str, str]] = set()
             while queue:
@@ -509,11 +566,15 @@ class EntrypointFlow:
                         graph.add_edge(
                             source_unit_id,
                             target_unit_id,
-                            normalize_condition(source_unit_id, target_unit_id, inherited_condition),
+                            normalize_condition(
+                                source_unit_id, target_unit_id, inherited_condition
+                            ),
                         )
                     continue
                 for successor in raw_cfg.successors(current_raw):
-                    own_condition = raw_cfg.edges[current_raw, successor].get("condition", "")
+                    own_condition = raw_cfg.edges[current_raw, successor].get(
+                        "condition", ""
+                    )
                     queue.append((successor, inherited_condition or own_condition))
 
         # Connect synthetic start to all represented nodes reachable from raw roots.
@@ -557,7 +618,9 @@ class EntrypointFlow:
         for node_id, data in self._G.nodes(data=True):
             if _clean(data.get("label", "")).upper() != "METHOD":
                 continue
-            external = _clean(data.get("IS_EXTERNAL", data.get("ISEXTERNAL", ""))).lower()
+            external = _clean(
+                data.get("IS_EXTERNAL", data.get("ISEXTERNAL", ""))
+            ).lower()
             if external == "true":
                 continue
             name = _clean(data.get("NAME", ""))
@@ -577,7 +640,6 @@ class EntrypointFlow:
             for parameter in method.parameters
         ]
 
-
     def _extract_output_parameters(
         self,
         method: MethodGraph,
@@ -593,7 +655,7 @@ class EntrypointFlow:
                 return_type.type_full_name or "unknown",
             )
         ]
-    
+
     def _prune_unreachable(
         self,
         graph: SemanticFlowGraph,
@@ -624,10 +686,7 @@ class EntrypointFlow:
             key: edge
             for key, edge in graph.edges.items()
             if edge.source_id == graph.start_node_id
-            or (
-                edge.source_id in graph.nodes
-                and edge.target_id in graph.nodes
-            )
+            or (edge.source_id in graph.nodes and edge.target_id in graph.nodes)
         }
 
         graph.return_node_ids &= set(graph.nodes)
@@ -665,9 +724,7 @@ class EntrypointFlow:
                 continue
 
             target_id = (
-                canonical_return_id
-                if edge.target_id in return_ids
-                else edge.target_id
+                canonical_return_id if edge.target_id in return_ids else edge.target_id
             )
 
             if edge.source_id == target_id:
@@ -679,9 +736,9 @@ class EntrypointFlow:
                 condition=edge.condition,
             )
 
-            merged_edges[
-                (merged.source_id, merged.target_id, merged.condition)
-            ] = merged
+            merged_edges[(merged.source_id, merged.target_id, merged.condition)] = (
+                merged
+            )
 
         graph.edges = merged_edges
 
@@ -722,19 +779,27 @@ def print_entrypoint_flow(
         print(f" [{entry.call_index:>3}] {indent}{method.name} ({method.full_name})")
         if show_semantic and graph:
             for unit in graph.nodes.values():
-                print(f" {indent}  {unit.kind.value.upper():12s} L{unit.line:>4} {unit.code}")
+                print(
+                    f" {indent}  {unit.kind.value.upper():12s} L{unit.line:>4} {unit.code}"
+                )
                 if unit.defines:
-                    print(f" {indent}    DEF: " + ", ".join(v.name for v in unit.defines))
+                    print(
+                        f" {indent}    DEF: " + ", ".join(v.name for v in unit.defines)
+                    )
                 if unit.uses:
                     print(f" {indent}    USE: " + ", ".join(v.name for v in unit.uses))
                 if unit.internal_callee_full_names:
-                    print(f" {indent}    INTERNAL: " + ", ".join(unit.internal_callee_full_names))
+                    print(
+                        f" {indent}    INTERNAL: "
+                        + ", ".join(unit.internal_callee_full_names)
+                    )
             print(f" {indent}  EDGES: {len(graph.edges)}")
         print()
 
     if show_external and result.external_calls:
         print(" external calls:")
         for call in result.external_calls:
-            print(f"  {call.caller_full_name} → {call.callee_full_name} L{call.line} {call.call_code}")
+            print(
+                f"  {call.caller_full_name} → {call.callee_full_name} L{call.line} {call.call_code}"
+            )
     print("═" * 76)
-

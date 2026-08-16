@@ -1,55 +1,52 @@
 import html
 import re
 import string
-import sys
-from collections import defaultdict, deque
+from collections import deque
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Dict, List, Set, Tuple, Optional
-
-
-import matplotlib.pyplot as plt
 import networkx as nx
-from matplotlib.patches import Circle, Polygon, PathPatch
-from matplotlib.path import Path as MplPath
-
-
-import pydot
-
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
-
 LOG_METHOD_NAMES: Set[str] = {
     # Java logging frameworks
-    "info", "warn", "warning", "debug", "error", "trace", "fatal", "log",
-
+    "info",
+    "warn",
+    "warning",
+    "debug",
+    "error",
+    "trace",
+    "fatal",
+    "log",
     # System output streams (for catching shutdown hooks, startup messages, etc.)
-    "println",      # System.out.println(), System.err.println()
-    "print",        # System.out.print(), System.err.print()
-
+    "println",  # System.out.println(), System.err.println()
+    "print",  # System.out.print(), System.err.print()
     # Go logrus / zap / zerolog
-    "infof", "warnf", "debugf", "errorf", "fatalf", "panicf",
-    "infoln", "warnln", "debugln", "errorln",
+    "infof",
+    "warnf",
+    "debugf",
+    "errorf",
+    "fatalf",
+    "panicf",
+    "infoln",
+    "warnln",
+    "debugln",
+    "errorln",
     "printf",
     "msg",
     "msgf",
-
     # SLF4J / Logback
     "slf4j",
-
     # Apache Commons Logging
     "commons",
-
     # Log4j
     "log4j",
-
     # Custom logger patterns
-    "write",        # Writer.write()
+    "write",  # Writer.write()
     "WriteLine",
-    "flush",        # BufferedWriter.flush()
+    "flush",  # BufferedWriter.flush()
 }
 
 AST_LABEL = "AST"
@@ -60,7 +57,11 @@ METHOD_LABEL = "METHOD"
 WILDCARD = "<*>"
 STRING_RE = re.compile(r'["`\'](.*?)["`\']', re.DOTALL)
 LITERAL_LABELS: Set[str] = {
-    "LITERAL", "STRING", "STRING_LITERAL", "NUMBER_LITERAL", "FIELD_IDENTIFIER",
+    "LITERAL",
+    "STRING",
+    "STRING_LITERAL",
+    "NUMBER_LITERAL",
+    "FIELD_IDENTIFIER",
 }
 
 
@@ -101,7 +102,7 @@ class LogMapping:
 
 
 def _clean(v) -> str:
-    return html.unescape(str(v).strip().strip('\"')).strip()
+    return html.unescape(str(v).strip().strip('"')).strip()
 
 
 def _label(G: nx.MultiDiGraph, nid) -> str:
@@ -114,7 +115,8 @@ def _code(G: nx.MultiDiGraph, nid) -> str:
 
 def _ast_children(G: nx.MultiDiGraph, nid) -> List:
     return [
-        v for _, v, d in G.edges(nid, data=True)
+        v
+        for _, v, d in G.edges(nid, data=True)
         if _clean(d.get("label", "")).upper() == AST_LABEL
     ]
 
@@ -130,11 +132,11 @@ def _reaching_def_predecessors(G: nx.MultiDiGraph, nid) -> List[Tuple[str, str]]
 def _normalize_code(s: str) -> str:
     s = str(s)
     s = html.unescape(s)
-    s = s.replace(r'\"', '"')
+    s = s.replace(r"\"", '"')
     s = s.replace(r"\'", "'")
     s = s.replace(r"\\", "\\")
     s = re.sub(r"\s+", " ", s)
-    return s.strip().strip('\"').strip()
+    return s.strip().strip('"').strip()
 
 
 def _arg_nodes(G: nx.MultiDiGraph, call_nid) -> List:
@@ -146,7 +148,7 @@ def _arg_nodes(G: nx.MultiDiGraph, call_nid) -> List:
 
         idx = G.nodes[v].get("ARGUMENT_INDEX", 999999)
         try:
-            idx = int(str(idx).strip('\"'))
+            idx = int(str(idx).strip('"'))
         except Exception:
             idx = 999999
 
@@ -165,7 +167,9 @@ def _tokenize(s: str) -> List[str]:
 # ---------------------------------------------------------------------------
 
 
-def _find_parent_method(G: nx.MultiDiGraph, call_node_id: str) -> Tuple[Optional[str], Optional[str]]:
+def _find_parent_method(
+    G: nx.MultiDiGraph, call_node_id: str
+) -> Tuple[Optional[str], Optional[str]]:
     """
     Find the parent METHOD node for a given CALL node.
     Returns (method_name, method_node_id) or (None, None)
@@ -205,19 +209,19 @@ def _clean_text_selective(text: str) -> str:
 
     text = str(text)
 
-    text = text.replace(r'\\', ' ')
-    text = text.replace(r'\"', ' ')
-    text = text.replace(r"\'", ' ')
-    text = text.replace(r'\/', ' ')
-    text = re.sub(r'\[a-zA-Z]', ' ', text)
+    text = text.replace(r"\\", " ")
+    text = text.replace(r"\"", " ")
+    text = text.replace(r"\'", " ")
+    text = text.replace(r"\/", " ")
+    text = re.sub(r"\[a-zA-Z]", " ", text)
 
     PUNCTUATION_TO_REMOVE = set(string.punctuation)
-    PUNCTUATION_TO_REMOVE.discard('-')  # KEEP hyphens
+    PUNCTUATION_TO_REMOVE.discard("-")  # KEEP hyphens
 
     for p in PUNCTUATION_TO_REMOVE:
-        text = text.replace(p, ' ')
+        text = text.replace(p, " ")
 
-    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r"\s+", " ", text)
     text = text.strip()
     text = text.lower()
     return text
@@ -226,7 +230,7 @@ def _clean_text_selective(text: str) -> str:
 def _normalize_code_selective(s: str) -> str:
     """Normalize CODE attributes with selective cleaning"""
     s = str(s)
-    s = s.strip().strip('\'"')
+    s = s.strip().strip("'\"")
     s = _clean_text_selective(s)
     return s
 
@@ -385,14 +389,16 @@ def build_templates_from_cpg(
         tokens = _tokenize(raw)
         static_count = sum(1 for t in tokens if t != WILDCARD)
 
-        templates.append(LogTemplateWithMethod(
-            call_node_id=str(nid),
-            method_name=method_name,
-            method_node_id=str(method_node_id),
-            raw_template=raw,
-            tokens=tokens,
-            static_count=static_count,
-        ))
+        templates.append(
+            LogTemplateWithMethod(
+                call_node_id=str(nid),
+                method_name=method_name,
+                method_node_id=str(method_node_id),
+                raw_template=raw,
+                tokens=tokens,
+                static_count=static_count,
+            )
+        )
 
     return templates
 
@@ -412,12 +418,14 @@ def build_trie(templates: List[LogTemplateWithMethod]) -> TrieNode:
             if key not in node.children:
                 node.children[key] = TrieNode()
             node = node.children[key]
-        node.terminals.append(LogTemplate(
-            call_node_id=tmpl.call_node_id,
-            raw_template=tmpl.raw_template,
-            tokens=tmpl.tokens,
-            static_count=tmpl.static_count,
-        ))
+        node.terminals.append(
+            LogTemplate(
+                call_node_id=tmpl.call_node_id,
+                raw_template=tmpl.raw_template,
+                tokens=tmpl.tokens,
+                static_count=tmpl.static_count,
+            )
+        )
 
     return root
 
@@ -490,340 +498,32 @@ def map_logs(
         if candidates:
             best = max(candidates, key=lambda t: (t.static_count, len(t.tokens)))
             method_name, method_node_id = method_lookup.get(
-                best.call_node_id,
-                ("unknown", "unknown")
+                best.call_node_id, ("unknown", "unknown")
             )
-            mappings.append(LogMapping(
-                bucket=bucket,
-                message=message,
-                call_node_id=best.call_node_id,
-                method_name=method_name,
-                method_node_id=method_node_id,
-                template=best.raw_template,
-                score=best.static_count,
-                matched=True,
-            ))
+            mappings.append(
+                LogMapping(
+                    bucket=bucket,
+                    message=message,
+                    call_node_id=best.call_node_id,
+                    method_name=method_name,
+                    method_node_id=method_node_id,
+                    template=best.raw_template,
+                    score=best.static_count,
+                    matched=True,
+                )
+            )
         else:
-            mappings.append(LogMapping(
-                bucket=bucket,
-                message=message,
-                call_node_id="",
-                method_name="",
-                method_node_id="",
-                template="",
-                score=0,
-                matched=False,
-            ))
+            mappings.append(
+                LogMapping(
+                    bucket=bucket,
+                    message=message,
+                    call_node_id="",
+                    method_name="",
+                    method_node_id="",
+                    template="",
+                    score=0,
+                    matched=False,
+                )
+            )
 
     return mappings
-
-
-# ---------------------------------------------------------------------------
-# Trie visualization
-# ---------------------------------------------------------------------------
-
-
-def _trie_bfs(root: TrieNode):
-    counter = [0]
-
-    def new_id():
-        counter[0] += 1
-        return counter[0]
-
-    root_id = new_id()
-    queue = deque([(root, root_id, None, None)])
-
-    while queue:
-        trie_node, nid, parent_id, edge_key = queue.popleft()
-        yield nid, parent_id, edge_key, trie_node
-
-        for key, child in trie_node.children.items():
-            cid = new_id()
-            queue.append((child, cid, nid, key))
-
-
-def _tree_layout(
-    edges: List[Tuple[int, int]],
-    root_id: int,
-) -> Dict[int, Tuple[float, float]]:
-    adj = defaultdict(list)
-    for fr, to in edges:
-        adj[fr].append(to)
-
-    visit_order = []
-    visited = set()
-    bfs = deque([root_id])
-    visited.add(root_id)
-
-    while bfs:
-        n = bfs.popleft()
-        visit_order.append(n)
-        for c in adj[n]:
-            if c not in visited:
-                visited.add(c)
-                bfs.append(c)
-
-    node_w = 2.8
-    width = {}
-
-    for n in reversed(visit_order):
-        ch = adj[n]
-        width[n] = max(node_w, sum(width[c] for c in ch)) if ch else node_w
-
-    pos = {}
-    x_start = {root_id: -width[root_id] / 2}
-    depth = {root_id: 0}
-
-    for n in visit_order:
-        cx = x_start[n] + width[n] / 2
-        pos[n] = (cx, -depth[n] * 2.5)
-
-        cursor = x_start[n]
-        for c in adj[n]:
-            depth[c] = depth[n] + 1
-            x_start[c] = cursor
-            cursor += width[c]
-
-    return pos
-
-
-def _draw_curved_edge(ax, x0, y0, x1, y1, color="#93c5fd", lw=1.8):
-    verts = [
-        (x0, y0),
-        (x0, (y0 + y1) / 2),
-        (x1, (y0 + y1) / 2),
-        (x1, y1),
-    ]
-    codes = [
-        MplPath.MOVETO,
-        MplPath.CURVE4,
-        MplPath.CURVE4,
-        MplPath.CURVE4,
-    ]
-    path = MplPath(verts, codes)
-    patch = PathPatch(path, facecolor="none", edgecolor=color, lw=lw)
-    ax.add_patch(patch)
-
-
-def _draw_circle_node(ax, x, y, label=None,
-                      radius=0.38,
-                      face="#2563eb",
-                      edge="#1e3a8a"):
-    circ = Circle((x, y), radius=radius, facecolor=face,
-                  edgecolor=edge, linewidth=2)
-    ax.add_patch(circ)
-    ax.text(
-        x, y, label,
-        ha="center", va="center",
-        fontsize=8.5, color="white",
-        family="monospace", weight="bold"
-    )
-
-
-def _draw_diamond_node(ax, x, y, label=None,
-                       size=0.52,
-                       face="#059669",
-                       edge="#064e3b"):
-    pts = [
-        (x, y + size),
-        (x + size, y),
-        (x, y - size),
-        (x - size, y),
-    ]
-    poly = Polygon(pts, closed=True, facecolor=face,
-                   edgecolor=edge, linewidth=2)
-    ax.add_patch(poly)
-    ax.text(
-        x, y, label,
-        ha="center", va="center",
-        fontsize=8.5, color="white",
-        family="monospace", weight="bold"
-    )
-
-
-def visualize_trie_matplotlib(
-    root: TrieNode,
-    output_path: str = "trie.png",
-) -> None:
-    node_rows = []
-    edge_rows = []
-
-    for nid, parent_id, edge_key, trie_node in _trie_bfs(root):
-        term_ids = [t.call_node_id for t in trie_node.terminals]
-        disp = "ROOT" if parent_id is None else (WILDCARD if edge_key == WILDCARD else edge_key)
-        node_rows.append((nid, disp, bool(trie_node.terminals), term_ids))
-        if parent_id is not None:
-            edge_rows.append((parent_id, nid, edge_key))
-
-    root_id = node_rows[0][0]
-    pos = _tree_layout([(fr, to) for fr, to, _ in edge_rows], root_id)
-
-    fig, ax = plt.subplots(figsize=(18, 10))
-    fig.patch.set_facecolor("white")
-    ax.set_facecolor("#f8fafc")
-
-    for fr, to, key in edge_rows:
-        x0, y0 = pos[fr]
-        x1, y1 = pos[to]
-        _draw_curved_edge(ax, x0, y0, x1, y1)
-
-        mx = (x0 + x1) / 2
-        my = y0 * 0.35 + y1 * 0.65
-        disp = WILDCARD if key == WILDCARD else key
-        ax.text(
-            mx, my, disp,
-            ha="center", va="center",
-            fontsize=8.5, color="#374151",
-            bbox=dict(boxstyle="round,pad=0.15",
-                      facecolor="white", edgecolor="none", alpha=0.9)
-        )
-
-    for nid, label, is_term, call_ids in node_rows:
-        x, y = pos[nid]
-        if is_term:
-            _draw_diamond_node(ax, x, y)
-        else:
-            _draw_circle_node(ax, x, y)
-
-        if call_ids:
-            ax.text(
-                x, y - 0.9,
-                "→ " + ", ".join(call_ids),
-                ha="center", va="top",
-                fontsize=7.5, color="#065f46"
-            )
-
-    ax.text(
-        0.5, 1.02,
-        "Log Template Trie",
-        transform=ax.transAxes,
-        ha="center", va="bottom",
-        fontsize=18, weight="bold", color="#111827"
-    )
-    ax.text(
-        0.5, 0.99,
-        "Blue circle = internal trie node | Green diamond = terminal (CPG CALL node) | <*> = wildcard",
-        transform=ax.transAxes,
-        ha="center", va="bottom",
-        fontsize=10, color="#6b7280"
-    )
-
-    all_x = [p[0] for p in pos.values()]
-    all_y = [p[1] for p in pos.values()]
-    pad_x = 2.5
-    pad_y = 2.0
-
-    ax.set_xlim(min(all_x) - pad_x, max(all_x) + pad_x)
-    ax.set_ylim(min(all_y) - pad_y, max(all_y) + pad_y)
-    ax.axis("off")
-
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=180, bbox_inches="tight")
-    plt.close(fig)
-
-    print(f"[Trie] Saved matplotlib PNG -> {output_path}")
-
-
-# ---------------------------------------------------------------------------
-# Pipeline
-# ---------------------------------------------------------------------------
-
-
-def run_pipeline(
-    G: nx.MultiDiGraph,
-    log_rows: List[Tuple[str, str]],
-    trie_image: str = "trie.png",
-    max_ddg_depth: int = 5,
-    min_static: int = 1,
-):
-    templates = build_templates_from_cpg(G, max_ddg_depth=max_ddg_depth)
-    root = build_trie(templates)
-    visualize_trie_matplotlib(root, output_path=trie_image)
-    mappings = map_logs(log_rows, root, templates, min_static=min_static)
-    return templates, root, mappings
-
-
-def load_dot_graph(dot_path: str) -> nx.MultiDiGraph:
-    graphs = pydot.graph_from_dot_file(dot_path)
-    if not graphs:
-        raise ValueError(f"Failed to parse DOT file: {dot_path}")
-
-    P = graphs[0]
-    G = nx.MultiDiGraph()
-
-    for node in P.get_nodes():
-        name = node.get_name()
-        if name in (None, "node", "graph", "edge"):
-            continue
-        nid = str(name).strip('"')
-        attrs = {k: v for k, v in node.get_attributes().items()}
-        G.add_node(nid, **attrs)
-
-    for edge in P.get_edges():
-        src = str(edge.get_source()).strip('"')
-        dst = str(edge.get_destination()).strip('"')
-        attrs = {k: v for k, v in edge.get_attributes().items()}
-        G.add_edge(src, dst, **attrs)
-
-    return G
-
-
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
-
-
-def main() -> None:
-    if len(sys.argv) < 3:
-        print("Usage: python cpg_trie_visualizer_matplotlib.py <export.dot> <trie.png>")
-        sys.exit(1)
-
-    dot_path = sys.argv[1]
-    image_path = sys.argv[2]
-
-    if not Path(dot_path).exists():
-        print(f"ERROR: file not found: {dot_path}")
-        sys.exit(1)
-
-    print(f"[CPG] Loading DOT: {dot_path}")
-    G = load_dot_graph(dot_path)
-    print(f"[CPG] nodes={G.number_of_nodes()} edges={G.number_of_edges()}")
-
-    log_rows = [
-        ("b1", '"received ad request (context_words=[clothing, tops])"'),
-    ]
-
-    templates, root, mappings = run_pipeline(
-        G,
-        log_rows,
-        trie_image=image_path,
-        max_ddg_depth=5,
-        min_static=1,
-    )
-
-    print("\nTemplates with Methods:")
-    if not templates:
-        print("  (none)")
-    else:
-        for t in templates:
-            print(f"  [{t.call_node_id}] {t.method_name}() -> '{t.raw_template}' (static={t.static_count})")
-
-    print("\nLog to Method Mapping:")
-    if not mappings:
-        print("  (none)")
-    else:
-        for m in mappings:
-            if m.matched:
-                print(f"  ✓ Log Message: {m.message}")
-                print(f"    Method: {m.method_name}()")
-                print(f"    Template: '{m.template}' (score={m.score})")
-                print(f"    CPG Call: {m.call_node_id} | CPG Method: {m.method_node_id}")
-            else:
-                print(f"  ✗ Log Message: {m.message}")
-                print(f"    Status: UNMATCHED")
-
-    print("\nDone. Trie image saved as: trie.png")
-
-
-if __name__ == "__main__":
-    main()

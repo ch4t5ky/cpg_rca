@@ -9,6 +9,7 @@ branches with the same observed template remain alternatives in that frontier.
 This is intentionally independent from CPG construction: give it the already
 built ``Dict[str, StaticLogFSM]`` and a DataFrame with timestamp/message.
 """
+
 from __future__ import annotations
 
 import re
@@ -177,20 +178,28 @@ class ChainStore:
     ) -> List[TransitionMatch]:
         result: List[TransitionMatch] = []
         for transition in candidates:
-            if observed_call_node_id and str(transition.log_call_node_id) != str(observed_call_node_id):
+            if observed_call_node_id and str(transition.log_call_node_id) != str(
+                observed_call_node_id
+            ):
                 continue
-            score = 1.0 if observed_call_node_id else template_score(message, transition.template)
+            score = (
+                1.0
+                if observed_call_node_id
+                else template_score(message, transition.template)
+            )
             if score < self.threshold:
                 continue
-            result.append(TransitionMatch(
-                fsm_key=fsm_key,
-                transition_id=transition.id,
-                source_state=transition.source_segment_id,
-                target_state=transition.target_segment_id,
-                log_call_node_id=transition.log_call_node_id,
-                template=transition.template,
-                score=score,
-            ))
+            result.append(
+                TransitionMatch(
+                    fsm_key=fsm_key,
+                    transition_id=transition.id,
+                    source_state=transition.source_segment_id,
+                    target_state=transition.target_segment_id,
+                    log_call_node_id=transition.log_call_node_id,
+                    template=transition.template,
+                    score=score,
+                )
+            )
         return result
 
     def _advance_chain(
@@ -207,7 +216,9 @@ class ChainStore:
             for state_id in chain.frontier
             for transition in self._outgoing[chain.fsm_key].get(state_id, [])
         ]
-        matches = self._matches(chain.fsm_key, candidates, message, observed_call_node_id)
+        matches = self._matches(
+            chain.fsm_key, candidates, message, observed_call_node_id
+        )
         if not matches:
             return None
 
@@ -221,7 +232,16 @@ class ChainStore:
         chain.score += max(item.score for item in selected)
         transition_ids = tuple(dict.fromkeys(item.transition_id for item in selected))
         templates = tuple(dict.fromkeys(item.template for item in selected))
-        chain.logs.append(ChainLog(index, timestamp, bucket, message, transition_ids, max(item.score for item in selected)))
+        chain.logs.append(
+            ChainLog(
+                index,
+                timestamp,
+                bucket,
+                message,
+                transition_ids,
+                max(item.score for item in selected),
+            )
+        )
 
         fsm = self.fsms[chain.fsm_key]
         terminal = all(state_id in fsm.terminals for state_id in chain.frontier)
@@ -273,7 +293,9 @@ class ChainStore:
         )
         transition_ids = tuple(dict.fromkeys(item.transition_id for item in selected))
         templates = tuple(dict.fromkeys(item.template for item in selected))
-        chain.logs.append(ChainLog(index, timestamp, bucket, message, transition_ids, chain.score))
+        chain.logs.append(
+            ChainLog(index, timestamp, bucket, message, transition_ids, chain.score)
+        )
         self.active_chains[chain_id] = chain
 
         return ChainEvent(
@@ -292,13 +314,17 @@ class ChainStore:
         )
 
     def _prune(self) -> None:
-        active = [chain for chain in self.active_chains.values() if chain.status == "active"]
+        active = [
+            chain for chain in self.active_chains.values() if chain.status == "active"
+        ]
         if len(active) <= self.max_active_chains:
             return
         # Keep best-supported recent hypotheses; mark the rest instead of
         # deleting them, so the experiment remains auditable.
-        active.sort(key=lambda chain: (chain.score, chain.last_timestamp or -1), reverse=True)
-        for chain in active[self.max_active_chains:]:
+        active.sort(
+            key=lambda chain: (chain.score, chain.last_timestamp or -1), reverse=True
+        )
+        for chain in active[self.max_active_chains :]:
             chain.status = "pruned"
             chain.termination_reason = "active_chain_limit"
 
@@ -332,25 +358,33 @@ class ChainStore:
         # extends another active hypothesis. Keep both alternatives.
         if self.allow_new_chains:
             for fsm_key, transitions in self._starts.items():
-                matches = self._matches(fsm_key, transitions, message, observed_call_node_id)
+                matches = self._matches(
+                    fsm_key, transitions, message, observed_call_node_id
+                )
                 if matches:
-                    events.append(self._start_chain(fsm_key, matches, index, timestamp, bucket, message))
+                    events.append(
+                        self._start_chain(
+                            fsm_key, matches, index, timestamp, bucket, message
+                        )
+                    )
 
         if not events:
-            events.append(ChainEvent(
-                index=index,
-                timestamp=timestamp,
-                bucket=bucket,
-                message=message,
-                chain_id=None,
-                fsm_key=None,
-                verdict="unknown",
-                source_states=(),
-                target_states=(),
-                transition_ids=(),
-                templates=(),
-                score=0.0,
-            ))
+            events.append(
+                ChainEvent(
+                    index=index,
+                    timestamp=timestamp,
+                    bucket=bucket,
+                    message=message,
+                    chain_id=None,
+                    fsm_key=None,
+                    verdict="unknown",
+                    source_states=(),
+                    target_states=(),
+                    transition_ids=(),
+                    templates=(),
+                    score=0.0,
+                )
+            )
 
         self.history.extend(events)
         self._prune()
@@ -376,38 +410,46 @@ class ChainStore:
             if call_node_column and pd.notna(row.get(call_node_column)):
                 call_node = str(row[call_node_column])
             for event in self.process(message, timestamp, bucket, index, call_node):
-                rows.append({
-                    "log_index": event.index,
-                    "timestamp": event.timestamp,
-                    "bucket": event.bucket,
-                    "message": event.message,
-                    "chain_id": event.chain_id,
-                    "entrypoint": event.fsm_key,
-                    "verdict": event.verdict,
-                    "source_states": " | ".join(event.source_states),
-                    "target_states": " | ".join(event.target_states),
-                    "transition_ids": " | ".join(event.transition_ids),
-                    "templates": " | ".join(event.templates),
-                    "score": event.score,
-                })
+                rows.append(
+                    {
+                        "log_index": event.index,
+                        "timestamp": event.timestamp,
+                        "bucket": event.bucket,
+                        "message": event.message,
+                        "chain_id": event.chain_id,
+                        "entrypoint": event.fsm_key,
+                        "verdict": event.verdict,
+                        "source_states": " | ".join(event.source_states),
+                        "target_states": " | ".join(event.target_states),
+                        "transition_ids": " | ".join(event.transition_ids),
+                        "templates": " | ".join(event.templates),
+                        "score": event.score,
+                    }
+                )
         return pd.DataFrame(rows)
 
     def chains_frame(self) -> pd.DataFrame:
         rows = []
         for chain in self.active_chains.values():
-            rows.append({
-                "chain_id": chain.chain_id,
-                "entrypoint": chain.fsm_key,
-                "status": chain.status,
-                "termination_reason": chain.termination_reason,
-                "created_at": chain.created_at,
-                "last_timestamp": chain.last_timestamp,
-                "score": chain.score,
-                "log_count": len(chain.logs),
-                "frontier_size": len(chain.frontier),
-                "frontier": " | ".join(chain.current_states),
-            })
-        return pd.DataFrame(rows).sort_values(["status", "score"], ascending=[True, False]) if rows else pd.DataFrame()
+            rows.append(
+                {
+                    "chain_id": chain.chain_id,
+                    "entrypoint": chain.fsm_key,
+                    "status": chain.status,
+                    "termination_reason": chain.termination_reason,
+                    "created_at": chain.created_at,
+                    "last_timestamp": chain.last_timestamp,
+                    "score": chain.score,
+                    "log_count": len(chain.logs),
+                    "frontier_size": len(chain.frontier),
+                    "frontier": " | ".join(chain.current_states),
+                }
+            )
+        return (
+            pd.DataFrame(rows).sort_values(["status", "score"], ascending=[True, False])
+            if rows
+            else pd.DataFrame()
+        )
 
 
 def classify_logs_with_chain_store(
@@ -436,6 +478,7 @@ def classify_logs_with_chain_store(
 # Compatibility alias for the current notebook naming convention.
 classifylogswithchainstore = classify_logs_with_chain_store
 
+
 def extract_logs(
     dataset_path: str,
     service: str,
@@ -455,7 +498,10 @@ def extract_logs(
                 except (ValueError, IndexError):
                     continue
                 log_service, message = row[1].strip(), row[2].strip()
-                if log_service.lower() == service.lower() and start_time <= timestamp <= end_time:
+                if (
+                    log_service.lower() == service.lower()
+                    and start_time <= timestamp <= end_time
+                ):
                     logs.append((timestamp, f"{log_service}@{timestamp}", message))
     except FileNotFoundError:
         print(f"ERROR: Dataset file not found: {dataset_path}")

@@ -5,12 +5,13 @@ from typing import Dict, List, Tuple
 
 import networkx as nx
 
+
 @dataclass
 class Entrypoint:
-    node_id:    str
-    name:       str
-    full_name:  str
-    filename:   str
+    node_id: str
+    name: str
+    full_name: str
+    filename: str
 
 
 class EntrypointDetector:
@@ -29,7 +30,7 @@ class EntrypointDetector:
     # ── public API ────────────────────────────────────────────────────────────
 
     def detect(self) -> List[Entrypoint]:
-        internal   = self._collect_internal_methods()
+        internal = self._collect_internal_methods()
         call_graph = self._build_call_graph(internal)
         return self._select_entrypoints(internal, call_graph)
 
@@ -37,7 +38,7 @@ class EntrypointDetector:
 
     def _attr(self, nid: str, key: str) -> str:
         raw = self._G.nodes.get(nid, {}).get(key, "")
-        s   = html.unescape(str(raw)).strip()
+        s = html.unescape(str(raw)).strip()
         if len(s) >= 2 and s[0] == s[-1] == '"':
             s = s[1:-1]
         return s
@@ -83,15 +84,12 @@ class EntrypointDetector:
     #   2. call_node is a CALL node
     #   3. call_node.METHOD_FULL_NAME resolves to some v in internal
 
-    def _build_call_graph(
-        self, internal: Dict[str, dict]
-    ) -> nx.DiGraph:
+    def _build_call_graph(self, internal: Dict[str, dict]) -> nx.DiGraph:
         """Returns a simple DiGraph (no multi-edges) over internal node ids."""
 
         # index: FULL_NAME → node_id  (for fast callee resolution)
         fn_index: Dict[str, str] = {
-            self._attr(nid, "FULL_NAME"): nid
-            for nid in internal
+            self._attr(nid, "FULL_NAME"): nid for nid in internal
         }
 
         cg = nx.DiGraph()
@@ -99,7 +97,12 @@ class EntrypointDetector:
 
         for method_nid in internal:
             for _, call_nid, edata in self._G.out_edges(method_nid, data=True):
-                el = html.unescape(str(edata.get("label", ""))).strip().strip('"').upper()
+                el = (
+                    html.unescape(str(edata.get("label", "")))
+                    .strip()
+                    .strip('"')
+                    .upper()
+                )
                 if el != "CONTAINS":
                     continue
                 if self._G.nodes[call_nid].get("label") != '"CALL"':
@@ -108,7 +111,7 @@ class EntrypointDetector:
                 callee_fn = self._attr(call_nid, "METHOD_FULL_NAME")
                 if callee_fn in fn_index:
                     callee_nid = fn_index[callee_fn]
-                    if callee_nid != method_nid:           # skip self-calls
+                    if callee_nid != method_nid:  # skip self-calls
                         cg.add_edge(method_nid, callee_nid)
 
         return cg
@@ -123,18 +126,20 @@ class EntrypointDetector:
 
         result: List[Entrypoint] = []
         for nid in cg.nodes:
-            in_d  = cg.in_degree(nid)
+            in_d = cg.in_degree(nid)
             out_d = cg.out_degree(nid)
 
             # Condition (1):  in_degree = 0  ∧  out_degree ≥ 1
             if in_d != 0 or out_d < 1:
                 continue
 
-            result.append(Entrypoint(
-                node_id    = nid,
-                name       = self._attr(nid, "NAME"),
-                full_name  = self._attr(nid, "FULL_NAME"),
-                filename   = self._attr(nid, "FILENAME"),
-            ))
+            result.append(
+                Entrypoint(
+                    node_id=nid,
+                    name=self._attr(nid, "NAME"),
+                    full_name=self._attr(nid, "FULL_NAME"),
+                    filename=self._attr(nid, "FILENAME"),
+                )
+            )
 
         return result

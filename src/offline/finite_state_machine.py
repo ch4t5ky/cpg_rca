@@ -2,7 +2,12 @@ from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from typing import Dict, Iterable, List, Optional, Set, Tuple
 
-from src.offline.flow import EntrypointFlowResult, SemanticFlowGraph, SemanticUnit, SemanticUnitKind
+from src.offline.flow import (
+    EntrypointFlowResult,
+    SemanticFlowGraph,
+    SemanticUnit,
+    SemanticUnitKind,
+)
 from src.offline.log import LogTemplateWithMethod
 
 
@@ -76,11 +81,16 @@ class StaticLogFSM:
 
     @property
     def terminals(self) -> set[str]:
-        return {state_id for state_id, state in self.states.items() if state.is_terminal}
+        return {
+            state_id for state_id, state in self.states.items() if state.is_terminal
+        }
 
     @property
     def edgeset(self) -> set[Tuple[str, str]]:
-        return {(edge.source_segment_id, edge.target_segment_id) for edge in self.transitions}
+        return {
+            (edge.source_segment_id, edge.target_segment_id)
+            for edge in self.transitions
+        }
 
     def outgoing(self, state_id: str) -> List[LogTransition]:
         return [edge for edge in self.transitions if edge.source_segment_id == state_id]
@@ -136,7 +146,9 @@ class _SegmentFacts:
         for callee in unit.callee_full_names:
             if _is_technical_call(callee):
                 continue
-            target = self.direct_methods if callee in known_methods else self.external_calls
+            target = (
+                self.direct_methods if callee in known_methods else self.external_calls
+            )
             if callee not in target:
                 target.append(callee)
                 changed = True
@@ -206,7 +218,9 @@ class LogFlowExtractor:
             fsm.warnings.append("Entrypoint has no semantic graph.")
             return fsm
 
-        self._build_from_graph(flow.entrypoint_full_name, graph, set(flow.semantic_graphs), fsm)
+        self._build_from_graph(
+            flow.entrypoint_full_name, graph, set(flow.semantic_graphs), fsm
+        )
         if not fsm.transitions:
             fsm.warnings.append("No logger CALL nodes matched the template catalog.")
         return fsm
@@ -281,18 +295,27 @@ class LogFlowExtractor:
                     previous_log_call_node_id=source_log_id,
                     next_log_call_node_id=target or None,
                     is_start=source_log_id is None,
-                    is_terminal=outcome.kind in {"RETURN_SEGMENT", "INCOMPLETE_SEGMENT"},
+                    is_terminal=outcome.kind
+                    in {"RETURN_SEGMENT", "INCOMPLETE_SEGMENT"},
                     kind=outcome.kind,
                 )
             else:
                 # Same observable state reached via a different CFG route:
                 # retain all descriptive facts without creating another node.
                 old = fsm.states[state_id]
-                merged_direct = _ordered_unique((*old.direct_methods, *outcome.facts.direct_methods))
-                merged_external = _ordered_unique((*old.external_calls, *outcome.facts.external_calls))
-                merged_conditions = _ordered_unique((*old.conditions, *outcome.facts.conditions))
+                merged_direct = _ordered_unique(
+                    (*old.direct_methods, *outcome.facts.direct_methods)
+                )
+                merged_external = _ordered_unique(
+                    (*old.external_calls, *outcome.facts.external_calls)
+                )
+                merged_conditions = _ordered_unique(
+                    (*old.conditions, *outcome.facts.conditions)
+                )
                 if (merged_direct, merged_external, merged_conditions) != (
-                    old.direct_methods, old.external_calls, old.conditions,
+                    old.direct_methods,
+                    old.external_calls,
+                    old.conditions,
                 ):
                     fsm.states[state_id] = ExecutionSegment(
                         id=old.id,
@@ -312,7 +335,9 @@ class LogFlowExtractor:
         states_by_source: Dict[Optional[str], List[str]] = defaultdict(list)
         for source_log_id, outcomes in outcomes_by_source.items():
             for outcome in outcomes.values():
-                states_by_source[source_log_id].append(resolve_state(source_log_id, outcome))
+                states_by_source[source_log_id].append(
+                    resolve_state(source_log_id, outcome)
+                )
 
         seen_transitions: Set[Tuple[str, str, str]] = set()
         transition_counter = 0
@@ -326,7 +351,8 @@ class LogFlowExtractor:
             # A transition is emitted from every interval that *ends* at this
             # physical logger call to every interval that begins after it.
             incoming = [
-                state_id for state_id, state in fsm.states.items()
+                state_id
+                for state_id, state in fsm.states.items()
                 if state.next_log_call_node_id == source_log_id
             ]
             for from_state_id in incoming:
@@ -335,17 +361,19 @@ class LogFlowExtractor:
                     if key in seen_transitions:
                         continue
                     seen_transitions.add(key)
-                    fsm.transitions.append(LogTransition(
-                        id=f"log_transition:{transition_counter}",
-                        source_segment_id=from_state_id,
-                        target_segment_id=to_state_id,
-                        template=source_template.raw_template,
-                        log_call_node_id=source_log_id,
-                        method_full_name=entrypoint_full_name,
-                        method_node_id=str(source_template.method_node_id),
-                        conditions=(),
-                        static_score=source_template.static_count,
-                    ))
+                    fsm.transitions.append(
+                        LogTransition(
+                            id=f"log_transition:{transition_counter}",
+                            source_segment_id=from_state_id,
+                            target_segment_id=to_state_id,
+                            template=source_template.raw_template,
+                            log_call_node_id=source_log_id,
+                            method_full_name=entrypoint_full_name,
+                            method_node_id=str(source_template.method_node_id),
+                            conditions=(),
+                            static_score=source_template.static_count,
+                        )
+                    )
                     transition_counter += 1
 
     def _discover_outcomes(
@@ -365,7 +393,11 @@ class LogFlowExtractor:
         facts_at_node: Dict[str, _SegmentFacts] = {}
         queue: deque[str] = deque()
 
-        initial_targets = successors.get(source_node_id, []) if source_is_log else [(source_node_id, "")]
+        initial_targets = (
+            successors.get(source_node_id, [])
+            if source_is_log
+            else [(source_node_id, "")]
+        )
         for target_id, condition in initial_targets:
             facts = _SegmentFacts()
             facts.add_condition(condition)
@@ -378,21 +410,29 @@ class LogFlowExtractor:
 
         outcomes: Dict[Tuple[str, str], _Outcome] = {}
 
-        def add_outcome(marker: Optional[_LogMarker], kind: str, facts: _SegmentFacts) -> None:
+        def add_outcome(
+            marker: Optional[_LogMarker], kind: str, facts: _SegmentFacts
+        ) -> None:
             next_id = marker.call_node_id if marker else ""
             key = (next_id, kind)
             outcome = outcomes.get(key)
             if outcome is None:
-                outcomes[key] = _Outcome(next_marker=marker, kind=kind, facts=facts.copy())
+                outcomes[key] = _Outcome(
+                    next_marker=marker, kind=kind, facts=facts.copy()
+                )
             else:
                 outcome.facts.merge(facts)
 
-        processed: Dict[str, Tuple[Tuple[str, ...], Tuple[str, ...], Tuple[str, ...]]] = {}
+        processed: Dict[
+            str, Tuple[Tuple[str, ...], Tuple[str, ...], Tuple[str, ...]]
+        ] = {}
         while queue:
             node_id = queue.popleft()
             facts = facts_at_node[node_id]
             fingerprint = (
-                tuple(facts.direct_methods), tuple(facts.external_calls), tuple(facts.conditions),
+                tuple(facts.direct_methods),
+                tuple(facts.external_calls),
+                tuple(facts.conditions),
             )
             if processed.get(node_id) == fingerprint:
                 continue
@@ -414,7 +454,11 @@ class LogFlowExtractor:
 
             outgoing = successors.get(node_id, [])
             if not outgoing:
-                kind = "RETURN_SEGMENT" if node_id in graph.return_node_ids else "INCOMPLETE_SEGMENT"
+                kind = (
+                    "RETURN_SEGMENT"
+                    if node_id in graph.return_node_ids
+                    else "INCOMPLETE_SEGMENT"
+                )
                 add_outcome(None, kind, local)
                 continue
 

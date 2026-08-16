@@ -4,7 +4,6 @@ from typing import Dict, List, Optional, Set, Tuple
 
 import networkx as nx
 
-
 # ─────────────────────────────────────────────────────────────────────────────
 # Helpers
 # ─────────────────────────────────────────────────────────────────────────────
@@ -37,32 +36,35 @@ def _edge_label(data: dict) -> str:
 @dataclass
 class Parameter:
     """METHOD_PARAMETER_IN — CPG spec §Method"""
-    index:               int
-    name:                str
-    type_full_name:      str
+
+    index: int
+    name: str
+    type_full_name: str
     evaluation_strategy: str
-    is_variadic:         bool
-    code:                str
-    node_id:             str
+    is_variadic: bool
+    code: str
+    node_id: str
 
 
 @dataclass
 class ReturnType:
     """METHOD_RETURN — CPG spec §Method"""
-    type_full_name:      str
+
+    type_full_name: str
     evaluation_strategy: str
-    code:                str
-    node_id:             str
+    code: str
+    node_id: str
 
 
 @dataclass
 class LocalVar:
     """LOCAL — CPG spec §Ast"""
-    name:           str
+
+    name: str
     type_full_name: str
-    code:           str
-    line:           str
-    node_id:        str
+    code: str
+    line: str
+    node_id: str
 
 
 @dataclass
@@ -72,22 +74,24 @@ class CallSite:
     We store only the id and callee full name; the callee body is NOT
     expanded here (use MethodConstructor recursively if needed).
     """
-    node_id:          str
-    name:             str           # short name
-    method_full_name: str           # fully qualified callee name
-    code:             str
-    line:             str
-    argument_index:   str           # position in parent call, if nested
+
+    node_id: str
+    name: str  # short name
+    method_full_name: str  # fully qualified callee name
+    code: str
+    line: str
+    argument_index: str  # position in parent call, if nested
 
 
 @dataclass
 class CfgNode:
     """One node in the execution-ordered CFG subgraph."""
-    node_id:   str
-    label:     str    # AST node type: CALL, RETURN, IDENTIFIER, LITERAL …
-    code:      str
-    line:      str
-    cfg_index: int    # position in execution order (0-based)
+
+    node_id: str
+    label: str  # AST node type: CALL, RETURN, IDENTIFIER, LITERAL …
+    code: str
+    line: str
+    cfg_index: int  # position in execution order (0-based)
 
 
 @dataclass
@@ -97,10 +101,11 @@ class PdgEdge:
     dep_type: CDG (control) or REACHING_DEF (data flow)
     variable:  the variable name carried by REACHING_DEF edges (else "")
     """
-    src:      str
-    dst:      str
-    dep_type: str   # "CDG" | "REACHING_DEF"
-    variable: str   # only for REACHING_DEF
+
+    src: str
+    dst: str
+    dep_type: str  # "CDG" | "REACHING_DEF"
+    variable: str  # only for REACHING_DEF
 
 
 @dataclass
@@ -133,27 +138,28 @@ class MethodGraph:
 
     ast_node_ids     full set of AST node ids belonging to this method
     """
-    method_node_id:   str
-    name:             str
-    full_name:        str
-    signature:        str
-    filename:         str
-    line_start:       str
-    line_end:         str
 
-    parameters:       List[Parameter]           = field(default_factory=list)
-    return_type:      Optional[ReturnType]       = None
-    local_vars:       List[LocalVar]             = field(default_factory=list)
+    method_node_id: str
+    name: str
+    full_name: str
+    signature: str
+    filename: str
+    line_start: str
+    line_end: str
 
-    call_sites:       List[CallSite]             = field(default_factory=list)
-    cfg_nodes:        List[CfgNode]              = field(default_factory=list)
-    cfg_edges:        List[Tuple[str, str, str]] = field(default_factory=list)
-    pdg_edges:        List[PdgEdge]              = field(default_factory=list)
+    parameters: List[Parameter] = field(default_factory=list)
+    return_type: Optional[ReturnType] = None
+    local_vars: List[LocalVar] = field(default_factory=list)
 
-    cfg_order:        Optional[List[str]]        = None
-    cfg_order_approx: List[str]                  = field(default_factory=list)
+    call_sites: List[CallSite] = field(default_factory=list)
+    cfg_nodes: List[CfgNode] = field(default_factory=list)
+    cfg_edges: List[Tuple[str, str, str]] = field(default_factory=list)
+    pdg_edges: List[PdgEdge] = field(default_factory=list)
 
-    ast_node_ids:     List[str]                  = field(default_factory=list)
+    cfg_order: Optional[List[str]] = None
+    cfg_order_approx: List[str] = field(default_factory=list)
+
+    ast_node_ids: List[str] = field(default_factory=list)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -180,13 +186,13 @@ class MethodConstructor:
         G = self._G
 
         mg = MethodGraph(
-            method_node_id = method_node_id,
-            name           = _attr(G, method_node_id, "NAME"),
-            full_name      = _attr(G, method_node_id, "FULL_NAME"),
-            signature      = _attr(G, method_node_id, "SIGNATURE"),
-            filename       = _attr(G, method_node_id, "FILENAME"),
-            line_start     = _attr(G, method_node_id, "LINE_NUMBER"),
-            line_end       = _attr(G, method_node_id, "LINE_NUMBER_END"),
+            method_node_id=method_node_id,
+            name=_attr(G, method_node_id, "NAME"),
+            full_name=_attr(G, method_node_id, "FULL_NAME"),
+            signature=_attr(G, method_node_id, "SIGNATURE"),
+            filename=_attr(G, method_node_id, "FILENAME"),
+            line_start=_attr(G, method_node_id, "LINE_NUMBER"),
+            line_end=_attr(G, method_node_id, "LINE_NUMBER_END"),
         )
 
         # 1. Collect all AST nodes belonging to this method (BFS on AST edges)
@@ -214,7 +220,7 @@ class MethodConstructor:
         mg.cfg_nodes = self._ordered_cfg_nodes(cfg_sub)
 
         # 7. Execution order
-        mg.cfg_order        = self._topo_order(cfg_sub)
+        mg.cfg_order = self._topo_order(cfg_sub)
         mg.cfg_order_approx = self._dfs_order(cfg_sub)
 
         # 8. PDG (CDG + REACHING_DEF)
@@ -247,15 +253,17 @@ class MethodConstructor:
             if _label(G, dst) != "METHOD_PARAMETER_IN":
                 continue
             idx_raw = _attr(G, dst, "INDEX")
-            params.append(Parameter(
-                index               = int(idx_raw) if idx_raw.isdigit() else 0,
-                name                = _attr(G, dst, "NAME"),
-                type_full_name      = _attr(G, dst, "TYPE_FULL_NAME"),
-                evaluation_strategy = _attr(G, dst, "EVALUATION_STRATEGY"),
-                is_variadic         = _attr(G, dst, "IS_VARIADIC").lower() == "true",
-                code                = _attr(G, dst, "CODE"),
-                node_id             = dst,
-            ))
+            params.append(
+                Parameter(
+                    index=int(idx_raw) if idx_raw.isdigit() else 0,
+                    name=_attr(G, dst, "NAME"),
+                    type_full_name=_attr(G, dst, "TYPE_FULL_NAME"),
+                    evaluation_strategy=_attr(G, dst, "EVALUATION_STRATEGY"),
+                    is_variadic=_attr(G, dst, "IS_VARIADIC").lower() == "true",
+                    code=_attr(G, dst, "CODE"),
+                    node_id=dst,
+                )
+            )
         return sorted(params, key=lambda p: p.index)
 
     # ── step 3: return type ───────────────────────────────────────────────────
@@ -267,10 +275,10 @@ class MethodConstructor:
                 continue
             if _label(G, dst) == "METHOD_RETURN":
                 return ReturnType(
-                    type_full_name      = _attr(G, dst, "TYPE_FULL_NAME"),
-                    evaluation_strategy = _attr(G, dst, "EVALUATION_STRATEGY"),
-                    code                = _attr(G, dst, "CODE"),
-                    node_id             = dst,
+                    type_full_name=_attr(G, dst, "TYPE_FULL_NAME"),
+                    evaluation_strategy=_attr(G, dst, "EVALUATION_STRATEGY"),
+                    code=_attr(G, dst, "CODE"),
+                    node_id=dst,
                 )
         return None
 
@@ -281,13 +289,15 @@ class MethodConstructor:
         locals_: List[LocalVar] = []
         for nid in ast_nodes:
             if _label(G, nid) == "LOCAL":
-                locals_.append(LocalVar(
-                    name           = _attr(G, nid, "NAME"),
-                    type_full_name = _attr(G, nid, "TYPE_FULL_NAME"),
-                    code           = _attr(G, nid, "CODE"),
-                    line           = _attr(G, nid, "LINE_NUMBER"),
-                    node_id        = nid,
-                ))
+                locals_.append(
+                    LocalVar(
+                        name=_attr(G, nid, "NAME"),
+                        type_full_name=_attr(G, nid, "TYPE_FULL_NAME"),
+                        code=_attr(G, nid, "CODE"),
+                        line=_attr(G, nid, "LINE_NUMBER"),
+                        node_id=nid,
+                    )
+                )
         return sorted(locals_, key=lambda l: l.line or "0")
 
     # ── step 5: call sites ────────────────────────────────────────────────────
@@ -298,28 +308,31 @@ class MethodConstructor:
         for nid in ast_nodes:
             if _label(G, nid) != "CALL":
                 continue
-            calls.append(CallSite(
-                node_id          = nid,
-                name             = _attr(G, nid, "NAME"),
-                method_full_name = _attr(G, nid, "METHOD_FULL_NAME"),
-                code             = _attr(G, nid, "CODE"),
-                line             = _attr(G, nid, "LINE_NUMBER"),
-                argument_index   = _attr(G, nid, "ARGUMENT_INDEX"),
-            ))
+            calls.append(
+                CallSite(
+                    node_id=nid,
+                    name=_attr(G, nid, "NAME"),
+                    method_full_name=_attr(G, nid, "METHOD_FULL_NAME"),
+                    code=_attr(G, nid, "CODE"),
+                    line=_attr(G, nid, "LINE_NUMBER"),
+                    argument_index=_attr(G, nid, "ARGUMENT_INDEX"),
+                )
+            )
         return sorted(calls, key=lambda c: c.line or "0")
 
     # ── step 6: CFG subgraph ──────────────────────────────────────────────────
 
     def _build_cfg_subgraph(self, ast_nodes: set) -> nx.DiGraph:
-        G   = self._G
+        G = self._G
         cfg = nx.DiGraph()
 
         for nid in ast_nodes:
             d = G.nodes[nid]
-            cfg.add_node(nid,
-                label = _clean(d.get("label", "")),
-                code  = _clean(d.get("CODE",  ""))[:80],
-                line  = _clean(d.get("LINE_NUMBER", "")),
+            cfg.add_node(
+                nid,
+                label=_clean(d.get("label", "")),
+                code=_clean(d.get("CODE", ""))[:80],
+                line=_clean(d.get("LINE_NUMBER", "")),
             )
 
         # Derive TRUE/FALSE labels from CONTROL_STRUCTURE AST structure
@@ -333,9 +346,7 @@ class MethodConstructor:
 
         return cfg
 
-    def _collect_branch_conditions(
-        self, ast_nodes: set
-    ) -> Dict[Tuple[str, str], str]:
+    def _collect_branch_conditions(self, ast_nodes: set) -> Dict[Tuple[str, str], str]:
         """
         Determines TRUE/FALSE condition for CFG edges that originate from
         the condition expression of a CONTROL_STRUCTURE node.
@@ -370,7 +381,7 @@ class MethodConstructor:
         • For loops (WHILE/FOR/DO) the TRUE successor enters the body
           and the FALSE successor exits the loop.
         """
-        G      = self._G
+        G = self._G
         result: Dict[Tuple[str, str], str] = {}
 
         for nid in ast_nodes:
@@ -395,7 +406,7 @@ class MethodConstructor:
             for _, dst, data in G.out_edges(nid, data=True):
                 if _edge_label(data) == "AST" and dst in ast_nodes:
                     order_raw = _clean(G.nodes[dst].get("ORDER", "99"))
-                    order     = int(order_raw) if order_raw.isdigit() else 99
+                    order = int(order_raw) if order_raw.isdigit() else 99
                     children.append((order, dst))
             children.sort()
 
@@ -421,7 +432,8 @@ class MethodConstructor:
 
             # ── 4. label CFG-successors of condition node ─────────────────
             cfg_succs = [
-                dst for _, dst, data in G.out_edges(cond_node, data=True)
+                dst
+                for _, dst, data in G.out_edges(cond_node, data=True)
                 if _edge_label(data) == "CFG" and dst in ast_nodes
             ]
 
@@ -459,13 +471,15 @@ class MethodConstructor:
         result = []
         for idx, nid in enumerate(order):
             d = cfg.nodes[nid]
-            result.append(CfgNode(
-                node_id   = nid,
-                label     = d.get("label", ""),
-                code      = d.get("code",  ""),
-                line      = d.get("line",  ""),
-                cfg_index = idx,
-            ))
+            result.append(
+                CfgNode(
+                    node_id=nid,
+                    label=d.get("label", ""),
+                    code=d.get("code", ""),
+                    line=d.get("line", ""),
+                    cfg_index=idx,
+                )
+            )
         return result
 
     # ── execution order ───────────────────────────────────────────────────────
@@ -502,19 +516,21 @@ class MethodConstructor:
     # ── step 8: PDG edges ─────────────────────────────────────────────────────
 
     def _collect_pdg_edges(self, ast_nodes: set) -> List[PdgEdge]:
-        G     = self._G
+        G = self._G
         edges: List[PdgEdge] = []
         for src, dst, data in G.edges(data=True):
             if src not in ast_nodes or dst not in ast_nodes:
                 continue
             lbl = _edge_label(data)
             if lbl in ("CDG", "REACHING_DEF"):
-                edges.append(PdgEdge(
-                    src      = src,
-                    dst      = dst,
-                    dep_type = lbl,
-                    variable = _clean(data.get("VARIABLE", "")),
-                ))
+                edges.append(
+                    PdgEdge(
+                        src=src,
+                        dst=dst,
+                        dep_type=lbl,
+                        variable=_clean(data.get("VARIABLE", "")),
+                    )
+                )
         return edges
 
 
@@ -535,7 +551,9 @@ def print_method_graph(mg: MethodGraph) -> None:
     print(f"\n  PARAMETERS ({len(mg.parameters)})")
     for p in mg.parameters:
         variadic = " *variadic*" if p.is_variadic else ""
-        print(f"    [{p.index}] {p.name}: {p.type_full_name}{variadic}  ({p.evaluation_strategy})")
+        print(
+            f"    [{p.index}] {p.name}: {p.type_full_name}{variadic}  ({p.evaluation_strategy})"
+        )
 
     rt = mg.return_type
     print(f"\n  RETURN TYPE")
@@ -556,7 +574,7 @@ def print_method_graph(mg: MethodGraph) -> None:
     has_topo = mg.cfg_order is not None
     order_src = "topological" if has_topo else "DFS approx (cyclic CFG)"
     print(f"  Execution order: {order_src}")
-    order    = mg.cfg_order if has_topo else mg.cfg_order_approx
+    order = mg.cfg_order if has_topo else mg.cfg_order_approx
     node_map = {cn.node_id: cn for cn in mg.cfg_nodes}
     # build condition lookup from cfg_edges
     cond_map: Dict[Tuple[str, str], str] = {
@@ -567,18 +585,19 @@ def print_method_graph(mg: MethodGraph) -> None:
         if cn:
             # show outgoing conditions for branching nodes
             out_conds = [
-                f"→{cond}" for (s, _), cond in cond_map.items()
-                if s == nid and cond
+                f"→{cond}" for (s, _), cond in cond_map.items() if s == nid and cond
             ]
             cond_str = "  " + " ".join(out_conds) if out_conds else ""
-            print(f"    {idx:>3}  L{cn.line:>4}  {cn.label:20s}  "
-                  f"{cn.code[:36]}{cond_str}")
+            print(
+                f"    {idx:>3}  L{cn.line:>4}  {cn.label:20s}  "
+                f"{cn.code[:36]}{cond_str}"
+            )
     if len(order) > 30:
         print(f"    … and {len(order)-30} more nodes")
 
     print(f"\n  PDG  ({len(mg.pdg_edges)} edges)")
     cdg_count = sum(1 for e in mg.pdg_edges if e.dep_type == "CDG")
-    rd_count  = sum(1 for e in mg.pdg_edges if e.dep_type == "REACHING_DEF")
+    rd_count = sum(1 for e in mg.pdg_edges if e.dep_type == "REACHING_DEF")
     print(f"    CDG: {cdg_count}   REACHING_DEF: {rd_count}")
     shown = 0
     for e in mg.pdg_edges:
@@ -603,10 +622,10 @@ def print_method_graph(mg: MethodGraph) -> None:
 
 @dataclass
 class PseudoLine:
-    indent:  int
-    text:    str
+    indent: int
+    text: str
     node_id: str
-    label:   str
+    label: str
 
 
 class PseudocodeGenerator:
@@ -619,13 +638,24 @@ class PseudocodeGenerator:
         "ASSIGNMENT",
     ]
 
-    _SKIP = frozenset({
-        "METHOD", "METHOD_RETURN",
-        "METHOD_PARAMETER_IN", "METHOD_PARAMETER_OUT",
-        "BLOCK", "FILE", "NAMESPACE_BLOCK",
-        "IDENTIFIER", "LITERAL", "FIELD_IDENTIFIER",
-        "TYPE_REF", "METHOD_REF", "UNKNOWN", "ANNOTATION",
-    })
+    _SKIP = frozenset(
+        {
+            "METHOD",
+            "METHOD_RETURN",
+            "METHOD_PARAMETER_IN",
+            "METHOD_PARAMETER_OUT",
+            "BLOCK",
+            "FILE",
+            "NAMESPACE_BLOCK",
+            "IDENTIFIER",
+            "LITERAL",
+            "FIELD_IDENTIFIER",
+            "TYPE_REF",
+            "METHOD_REF",
+            "UNKNOWN",
+            "ANNOTATION",
+        }
+    )
 
     def _line_priority(self, label: str) -> int:
         try:
@@ -670,7 +700,10 @@ class PseudocodeGenerator:
         sig += ":"
         result.append(PseudoLine(0, sig, mg.method_node_id, "METHOD"))
 
-        line_nodes = [best[k] for k in sorted(best.keys(), key=lambda x: int(x) if x.isdigit() else 0)]
+        line_nodes = [
+            best[k]
+            for k in sorted(best.keys(), key=lambda x: int(x) if x.isdigit() else 0)
+        ]
 
         indent = 1
         control_stack: List[str] = []
@@ -697,11 +730,16 @@ class PseudocodeGenerator:
             # если это обычная строка после тела if, а return не было,
             # схлопываем только один guard-блок
             if control_stack and label not in ("CONTROL_STRUCTURE",):
-                if text.startswith("log.WithField(") or ":=" in text or text.startswith("product :=") \
-                or text.startswith("packagingInfo") or text.startswith("recommendations"):
+                if (
+                    text.startswith("log.WithField(")
+                    or ":=" in text
+                    or text.startswith("product :=")
+                    or text.startswith("packagingInfo")
+                    or text.startswith("recommendations")
+                ):
                     indent = max(1, len(control_stack))
                     if len(control_stack) >= indent:
-                        control_stack = control_stack[:indent-1]
+                        control_stack = control_stack[: indent - 1]
 
         return result
 
@@ -734,16 +772,24 @@ class PseudocodeGenerator:
 
     def _format(
         self,
-        cn:          CfgNode,
-        label:       str,
-        call_index:  Dict[str, "CallSite"],
+        cn: CfgNode,
+        label: str,
+        call_index: Dict[str, "CallSite"],
         local_index: Dict[str, "LocalVar"],
     ) -> str:
         code = cn.code.strip()
 
         if label == "CONTROL_STRUCTURE":
-            keywords = ("if ", "for ", "while ", "switch ", "else", "try",
-                        "catch", "select")
+            keywords = (
+                "if ",
+                "for ",
+                "while ",
+                "switch ",
+                "else",
+                "try",
+                "catch",
+                "select",
+            )
             if any(code.lower().startswith(k) for k in keywords):
                 return code.rstrip("{").rstrip() + ":"
             return f"IF {code}:"
