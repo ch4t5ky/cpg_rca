@@ -1,11 +1,3 @@
-"""Build semantic control-flow graphs directly from Code Property Graph methods.
-
-No execution paths are enumerated.  For each reachable method, the public
-result contains one SemanticFlowGraph whose nodes are source-level operations
-and whose edges are possible control-flow transitions.
-"""
-from __future__ import annotations
-
 import html
 from collections import defaultdict, deque
 from dataclasses import dataclass, field

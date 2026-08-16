@@ -1,19 +1,3 @@
-"""Build a compact static log FSM from SemanticFlowGraph.
-
-A state represents one *observable interval*: source/start -> next logger call,
-or source/start -> terminal. Logger calls themselves are transitions.  Crucially,
-state identity is based on observable boundaries, not on every accumulated call
-inside the interval.  This prevents an error/return branch from becoming a new
-state merely because one more helper was called before returning.
-
-For every source boundary (method start or a logger CALL), the extractor runs a
-bounded graph data-flow walk until it reaches the next logger CALL, RETURN, or
-a dead end.  It never enumerates CFG paths.  Calls and guards are metadata on
-the resulting interval and are unioned when several CFG paths produce the same
-observable outcome.
-"""
-from __future__ import annotations
-
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from typing import Dict, Iterable, List, Optional, Set, Tuple

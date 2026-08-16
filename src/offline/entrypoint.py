@@ -29,9 +29,6 @@ class EntrypointDetector:
     # ── public API ────────────────────────────────────────────────────────────
 
     def detect(self) -> List[Entrypoint]:
-        """
-        Returns entrypoints sorted descending by out_degree (fan-out).
-        """
         internal   = self._collect_internal_methods()
         call_graph = self._build_call_graph(internal)
         return self._select_entrypoints(internal, call_graph)
