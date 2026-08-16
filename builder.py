@@ -168,8 +168,7 @@ def build_entrypoint_artifacts(
     templates,
     output_dir: Path,
     flow_max_depth: int = 5,
-    flow_max_paths: int = 50,
-    render_graphviz: bool = False,
+    flow_max_paths: int = 50
 ) -> list[dict]:
     """Строит FLOW и FSM для каждого entrypoint'а сервиса, сохраняет JSON (и PNG опционально)."""
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -205,25 +204,6 @@ def build_entrypoint_artifacts(
 
             semantic_image_path = None
             fsm_image_path = None
-            if render_graphviz:
-                from src.offline.visual import draw_semantic_graph_graphviz, draw_log_fsm_graphviz
-
-                semantic_graph = flow_result.semantic_graphs.get(entrypoint.full_name)
-                if semantic_graph is not None:
-                    semantic_image_path = draw_semantic_graph_graphviz(
-                        semantic_graph=semantic_graph,
-                        filename=f"{artifact_name}.semantic",
-                        output_dir=str(output_dir),
-                        fmt="png",
-                        rankdir="LR",
-                    )
-                fsm_image_path = draw_log_fsm_graphviz(
-                    fsm,
-                    filename=f"{artifact_name}.fsm",
-                    output_dir=str(output_dir),
-                    fmt="png",
-                    rankdir="LR",
-                )
 
             row = {
                 "entrypoint": entrypoint.name,
@@ -283,8 +263,7 @@ def process_service(
     output_root: Path,
     max_ddg_depth: int = 5,
     flow_max_depth: int = 5,
-    flow_max_paths: int = 50,
-    render_graphviz: bool = False,
+    flow_max_paths: int = 50
 ) -> dict:
     """Полный пайплайн обработки одного сервиса: CPG -> Log Trie + FLOW + FSM."""
     logger.info("=== Сервис: %s ===", service_name)
@@ -300,7 +279,6 @@ def process_service(
         output_dir=output_dir,
         flow_max_depth=flow_max_depth,
         flow_max_paths=flow_max_paths,
-        render_graphviz=render_graphviz,
     )
 
     summary = {
@@ -330,8 +308,7 @@ def process_services_dir(
     only_service: str | None = None,
     max_ddg_depth: int = 5,
     flow_max_depth: int = 5,
-    flow_max_paths: int = 50,
-    render_graphviz: bool = False,
+    flow_max_paths: int = 50
 ) -> list[dict]:
     """Обходит все сервисы в services_dir и обрабатывает каждый export.dot."""
     dot_files = discover_services(services_dir)
@@ -351,8 +328,7 @@ def process_services_dir(
                 output_root=output_root,
                 max_ddg_depth=max_ddg_depth,
                 flow_max_depth=flow_max_depth,
-                flow_max_paths=flow_max_paths,
-                render_graphviz=render_graphviz,
+                flow_max_paths=flow_max_paths
             )
         except Exception as error:  # noqa: BLE001 - не прерываем обработку остальных сервисов
             logger.exception("Сбой при обработке сервиса %s", service_name)
@@ -389,10 +365,6 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--max-ddg-depth", type=int, default=5, help="Глубина DDG для лог-шаблонов")
     parser.add_argument("--flow-max-depth", type=int, default=5, help="Максимальная глубина FLOW-обхода")
     parser.add_argument("--flow-max-paths", type=int, default=50, help="Максимум путей в FLOW-обходе")
-    parser.add_argument(
-        "--render-graphviz", action="store_true",
-        help="Дополнительно рендерить PNG для FLOW и FSM через Graphviz (медленнее)",
-    )
     parser.add_argument("-v", "--verbose", action="store_true", help="Подробный вывод (DEBUG)")
     return parser.parse_args(argv)
 
@@ -414,8 +386,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         only_service=args.service,
         max_ddg_depth=args.max_ddg_depth,
         flow_max_depth=args.flow_max_depth,
-        flow_max_paths=args.flow_max_paths,
-        render_graphviz=args.render_graphviz,
+        flow_max_paths=args.flow_max_paths
     )
 
     ok = sum(1 for s in summaries if s.get("entrypoints_error", 0) == 0 and "error" not in s)
