@@ -2,7 +2,7 @@ import html
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Dict, Iterable, List, Optional, Set, Tuple
+from typing import Dict, Iterable, List, Optional, Set, Tuple, Any
 
 import networkx as nx
 

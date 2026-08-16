@@ -7,7 +7,6 @@ from cpg import CodePropertyGraph, Method, CallSite
 from cpg import UsecaseChain, UsecaseChainGraph, ChainNode
 """
 
-from src.offline.constants import DEFAULT_PROJECT_PREFIXES
 from src.offline.method    import CallSite
 from src.offline.flow import SemanticFlowGraph, SemanticUnit, EntrypointFlow
 from src.offline.entrypoint  import Entrypoint, EntrypointDetector
