@@ -2,24 +2,39 @@
 runtime_analyzer.py
 ===================
 
-Trie-first multi-service runtime analyzer with incremental report export.
+Analyze runtime logs in one manually specified injection-centered interval and
+write exactly one LLM-ready incident artifact.
 
-For every service under --artifacts-dir, the analyzer loads:
-    trie.json                 -> runtime message to CPG CALL candidates
-    <entrypoint>.fsm.json     -> structural transition validation
-    <entrypoint>.flow.json    -> completed-path FLOW slice for LLM reports
+The analyzer loads paired Trie/FSM/FLOW artifacts, filters input CSV logs to:
 
-Reports are written immediately as they are produced. Large input streams do
-not need to finish before output/runtime_reports starts receiving JSON files.
+    [inject_time - before_sec, inject_time + after_sec]
+
+and writes one output file:
+
+    <output>/incident_context.json
+
+Each completed chain preserves its runtime-constrained `flow_slice` directly.
+That FLOW slice contains the original semantic-unit fields (including
+`call_code`, `caller_full_name`, `callee_full_name`, `line`, `depth`, and
+`call_index`) produced by flow_slicer.py.
 
 Usage:
     python3.12 runtime_analyzer.py \\
       --artifacts-dir output \\
       --logs dataset/logs.csv \\
-      --reports-dir output/runtime_reports \\
+      --output output/runtime_reports/incident_context.json \\
       --service-column container_name \\
-      --progress-every 1000 \\
-      --checkpoint-every 10000
+      --inject-time 1731903974
+
+    python3.12 runtime_analyzer.py \\
+      --artifacts-dir output \\
+      --logs dataset/logs.csv \\
+      --output output/runtime_reports/incident_context.json \\
+      --service-column container_name \\
+      --inject-time 1731903974 \\
+      --before-sec 30 \\
+      --after-sec 120 \\
+      --emit-incomplete
 """
 
 from __future__ import annotations
@@ -29,7 +44,6 @@ import json
 import logging
 import re
 import sys
-import time
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -44,8 +58,15 @@ logger = logging.getLogger("runtime_analyzer")
 
 _TIMESTAMP_ALIASES = ("timestamp", "time", "ts", "unix_timestamp", "event_time")
 _SERVICE_ALIASES = (
-    "service", "microservice", "container", "container_name", "containername",
-    "component", "application", "app", "source",
+    "service",
+    "microservice",
+    "container",
+    "container_name",
+    "containername",
+    "component",
+    "application",
+    "app",
+    "source",
 )
 _MESSAGE_ALIASES = ("message", "log", "log_message", "logmessage", "content", "text")
 _BUCKET_ALIASES = ("bucket", "stream", "source_bucket", "log_bucket")
@@ -62,7 +83,7 @@ def tuple_or_empty(value: Any) -> tuple:
 
 
 def load_fsm(path: Path) -> StaticLogFSM:
-    """Restore one StaticLogFSM from a builder.py <entrypoint>.fsm.json artifact."""
+    """Restore one StaticLogFSM from a builder.py .fsm.json artifact."""
     payload = json.loads(path.read_text(encoding="utf-8"))
 
     states: dict[str, ExecutionSegment] = {}
@@ -108,7 +129,7 @@ def load_fsm(path: Path) -> StaticLogFSM:
 
 
 def load_service_catalog(service_dir: Path, args: argparse.Namespace) -> ServiceCatalog | None:
-    """Load all paired Trie/FSM/FLOW artifacts for one service directory."""
+    """Load paired Trie/FSM/FLOW artifacts for one service directory."""
     fsms: dict[str, StaticLogFSM] = {}
     flows: dict[str, dict[str, Any]] = {}
 
@@ -131,7 +152,10 @@ def load_service_catalog(service_dir: Path, args: argparse.Namespace) -> Service
     trie_path = service_dir / "trie.json"
     trie_matcher = ServiceTrieMatcher(trie_path) if trie_path.is_file() else None
     if trie_matcher is None:
-        logger.warning("Service=%s has no trie.json; lexical FSM fallback will be used", service_dir.name)
+        logger.warning(
+            "Service=%s has no trie.json; lexical FSM fallback will be used",
+            service_dir.name,
+        )
 
     store = ExplicitHypothesisStore(
         fsms=paired_fsms,
@@ -152,25 +176,31 @@ def load_service_catalog(service_dir: Path, args: argparse.Namespace) -> Service
 
 def load_catalogs(artifacts_dir: Path, args: argparse.Namespace) -> dict[str, ServiceCatalog]:
     """Load every service with paired FLOW/FSM artifacts under artifacts_dir."""
+    if not artifacts_dir.is_dir():
+        raise FileNotFoundError(f"Artifacts directory does not exist: {artifacts_dir}")
+
     catalogs: dict[str, ServiceCatalog] = {}
     for service_dir in sorted(path for path in artifacts_dir.iterdir() if path.is_dir()):
         catalog = load_service_catalog(service_dir, args)
-        if catalog is not None:
-            catalogs[service_dir.name] = catalog
-            logger.info(
-                "Loaded service=%s entrypoints=%d trie=%s",
-                service_dir.name,
-                len(catalog.fsms),
-                bool(catalog.trie_matcher),
-            )
+        if catalog is None:
+            continue
+
+        catalogs[service_dir.name] = catalog
+        logger.info(
+            "Loaded service=%s entrypoints=%d trie=%s",
+            service_dir.name,
+            len(catalog.fsms),
+            bool(catalog.trie_matcher),
+        )
 
     if not catalogs:
         raise FileNotFoundError(f"No paired FLOW/FSM catalogs found under {artifacts_dir}")
+
     return catalogs
 
 
 # --------------------------------------------------------------------------- #
-# Runtime CSV schema resolution
+# CSV normalization and incident-window filtering
 # --------------------------------------------------------------------------- #
 
 def normalize_header(value: object) -> str:
@@ -187,11 +217,13 @@ def resolve_column(
 ) -> str | None:
     """Resolve a physical CSV header from an explicit name or known aliases."""
     normalized = {normalize_header(column): str(column) for column in columns}
+
     for candidate in ([requested] if requested else []) + list(aliases):
-        if candidate:
-            resolved = normalized.get(normalize_header(candidate))
-            if resolved is not None:
-                return resolved
+        if not candidate:
+            continue
+        resolved = normalized.get(normalize_header(candidate))
+        if resolved is not None:
+            return resolved
 
     if not required:
         return None
@@ -199,7 +231,7 @@ def resolve_column(
     raise ValueError(
         f"Cannot resolve required '{logical_name}' column. "
         f"Actual CSV columns: {list(map(str, columns))}. "
-        f"Pass --{logical_name}-column <actual-column-name>."
+        f"Pass --{logical_name}-column explicitly."
     )
 
 
@@ -209,13 +241,21 @@ def prepare_logs(raw: pd.DataFrame, args: argparse.Namespace) -> pd.DataFrame:
     service_column = resolve_column(raw.columns, args.service_column, _SERVICE_ALIASES, "service")
     message_column = resolve_column(raw.columns, args.message_column, _MESSAGE_ALIASES, "message")
     bucket_column = resolve_column(raw.columns, args.bucket_column, _BUCKET_ALIASES, "bucket", required=False)
-    call_node_column = resolve_column(raw.columns, args.call_node_column, _CALL_NODE_ALIASES, "call-node", required=False)
+    call_node_column = resolve_column(
+        raw.columns,
+        args.call_node_column,
+        _CALL_NODE_ALIASES,
+        "call-node",
+        required=False,
+    )
 
-    logs = pd.DataFrame({
-        "timestamp": pd.to_numeric(raw[timestamp_column], errors="coerce"),
-        "service": raw[service_column].astype(str).str.strip(),
-        "message": raw[message_column].astype(str),
-    })
+    logs = pd.DataFrame(
+        {
+            "timestamp": pd.to_numeric(raw[timestamp_column], errors="coerce"),
+            "service": raw[service_column].astype(str).str.strip(),
+            "message": raw[message_column].astype(str),
+        }
+    )
     logs = logs[logs["timestamp"].notna()].copy()
     logs["timestamp"] = logs["timestamp"].astype("int64")
 
@@ -238,88 +278,47 @@ def prepare_logs(raw: pd.DataFrame, args: argparse.Namespace) -> pd.DataFrame:
     return logs.reset_index(drop=True)
 
 
-# --------------------------------------------------------------------------- #
-# Incremental report and audit export
-# --------------------------------------------------------------------------- #
+def filter_incident_window(
+    logs: pd.DataFrame,
+    inject_time: int,
+    before_sec: int,
+    after_sec: int,
+) -> tuple[pd.DataFrame, int, int]:
+    """Keep only rows in [inject_time - before_sec, inject_time + after_sec]."""
+    if before_sec < 0 or after_sec < 0:
+        raise ValueError("--before-sec and --after-sec must be non-negative.")
 
-def safe_name(value: str) -> str:
-    """Create a deterministic filesystem-safe name component."""
-    value = re.sub(r"[^A-Za-z0-9._-]+", "_", value or "unnamed")
-    return value.strip("._") or "unnamed"
+    start_time = inject_time - before_sec
+    end_time = inject_time + after_sec
+    filtered = logs.loc[
+        logs["timestamp"].between(start_time, end_time, inclusive="both")
+    ].copy()
 
+    if filtered.empty:
+        raise ValueError(
+            "No runtime logs fall inside the requested incident window: "
+            f"[{start_time}, {end_time}], inject={inject_time}."
+        )
 
-def write_report_incrementally(
-    report: dict[str, Any],
-    reports_dir: Path,
-    sequence: int,
-) -> dict[str, Any]:
-    """Write exactly one report immediately and return its index metadata."""
-    service = safe_name(str(report.get("service", "unknown")))
-    report_type = safe_name(str(report.get("report_type", "report")))
-    chain_id = report.get("chain", {}).get("chain_id", report.get("chain_id", "event"))
-    hypothesis_id = report.get("hypothesis", {}).get("hypothesis_id", report.get("hypothesis_id", sequence))
-
-    filename = (
-        f"{sequence:09d}_{service}_chain_{chain_id}_"
-        f"hypothesis_{hypothesis_id}_{report_type}.json"
-    )
-    path = reports_dir / report_type / filename
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-
-    return {
-        "sequence": sequence,
-        "report_type": report.get("report_type"),
-        "service": report.get("service"),
-        "chain_id": chain_id,
-        "hypothesis_id": hypothesis_id,
-        "path": str(path),
-    }
-
-
-def write_partial_index(index: list[dict[str, Any]], reports_dir: Path, final: bool = False) -> None:
-    """Persist an index checkpoint so reports remain discoverable during processing."""
-    target = reports_dir / ("index.json" if final else "index.partial.json")
-    target.write_text(json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8")
-
-
-def write_audit(catalogs: dict[str, ServiceCatalog], reports_dir: Path) -> None:
-    """Write current chain/hypothesis snapshots for all services."""
-    audit_dir = reports_dir / "audit"
-    audit_dir.mkdir(parents=True, exist_ok=True)
-
-    for service, catalog in catalogs.items():
-        prefix = safe_name(service)
-        catalog.store.chains_frame().to_csv(audit_dir / f"{prefix}_chains.csv", index=False)
-        catalog.store.hypotheses_frame().to_csv(audit_dir / f"{prefix}_hypotheses.csv", index=False)
+    return filtered.reset_index(drop=True), start_time, end_time
 
 
 # --------------------------------------------------------------------------- #
-# Streaming execution
+# Stream execution and single incident artifact construction
 # --------------------------------------------------------------------------- #
 
-def process_incrementally(
+def process_window(
     logs: pd.DataFrame,
     processor: RuntimeStreamProcessor,
-    catalogs: dict[str, ServiceCatalog],
-    reports_dir: Path,
     progress_every: int,
-    checkpoint_every: int,
 ) -> list[dict[str, Any]]:
-    """
-    Process events one by one and export every produced report immediately.
-
-    This avoids collecting reports in memory and provides visible progress for
-    large runtime datasets.
-    """
-    reports_dir.mkdir(parents=True, exist_ok=True)
-    report_index: list[dict[str, Any]] = []
-    report_sequence = 0
-    started_at = time.monotonic()
-
+    """Process selected logs in timestamp order and retain reports only in memory."""
     ordered = logs.copy()
     ordered["__original_index"] = range(len(ordered))
     ordered = ordered.sort_values(["timestamp", "__original_index"], kind="stable")
+
+    reports: list[dict[str, Any]] = []
+    total = len(ordered)
 
     for processed_count, (_, row) in enumerate(ordered.iterrows(), start=1):
         call_node_id = None
@@ -334,29 +333,175 @@ def process_incrementally(
             message=str(row["message"]),
             observed_call_node_id=call_node_id,
         )
-        reports = processor.process(event)
-
-        for report in reports:
-            report_index.append(
-                write_report_incrementally(report, reports_dir, report_sequence)
-            )
-            report_sequence += 1
+        reports.extend(processor.process(event))
 
         if progress_every > 0 and processed_count % progress_every == 0:
-            elapsed = max(time.monotonic() - started_at, 1e-9)
-            logger.info(
-                "Progress: logs=%d/%d reports=%d rate=%.1f logs/s",
-                processed_count,
-                len(ordered),
-                report_sequence,
-                processed_count / elapsed,
+            logger.info("Progress: logs=%d/%d reports=%d", processed_count, total, len(reports))
+
+    return reports
+
+
+def report_identity(report: dict[str, Any]) -> tuple[Any, ...]:
+    """Deduplicate reports emitted through multiple compatible runtime paths."""
+    return (
+        report.get("report_type"),
+        report.get("service"),
+        report.get("chain", {}).get("chain_id", report.get("chain_id")),
+        report.get("hypothesis", {}).get("hypothesis_id", report.get("hypothesis_id")),
+        report.get("runtime_event", {}).get("index"),
+    )
+
+
+def deduplicate_reports(reports: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Keep the first emitted instance of each completed or unexplained report."""
+    unique: list[dict[str, Any]] = []
+    seen: set[tuple[Any, ...]] = set()
+
+    for report in reports:
+        key = report_identity(report)
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(report)
+
+    return unique
+
+
+def completed_chain(report: dict[str, Any]) -> dict[str, Any]:
+    """Preserve the report's runtime evidence and full constrained FLOW slice."""
+    chain = report.get("chain", {})
+    hypothesis = report.get("hypothesis", {})
+    entrypoint = report.get("entrypoint", {})
+
+    return {
+        "chain_id": chain.get("chain_id"),
+        "service": report.get("service"),
+        "entrypoint": entrypoint.get("full_name"),
+        "status": hypothesis.get("status"),
+        "score": hypothesis.get("cumulative_score"),
+        "time": report.get("time_window", {}),
+        "runtime_logs": report.get("runtime_evidence", []),
+        "flow": report.get("flow_slice", {}),
+        "ambiguity": report.get("ambiguity", {}),
+    }
+
+
+def sort_key_timestamp(item: dict[str, Any]) -> tuple[bool, int, str]:
+    """Stable sort key for timeline entries with optional timestamps."""
+    timestamp = item.get("timestamp")
+    return (
+        timestamp is None,
+        int(timestamp) if timestamp is not None else 0,
+        str(item.get("service", "")),
+    )
+
+
+def build_incident_context(
+    reports: list[dict[str, Any]],
+    inject_time: int,
+    start_time: int,
+    end_time: int,
+) -> dict[str, Any]:
+    """Build one LLM artifact without compacting FLOW semantic-unit code."""
+    completed_reports = [
+        report
+        for report in reports
+        if report.get("report_type") == "completed_execution_hypothesis"
+    ]
+    unexplained_reports = [
+        report
+        for report in reports
+        if report.get("report_type") in {
+            "structurally_unexplained_event",
+            "unknown_service_event",
+        }
+    ]
+    incomplete_reports = [
+        report
+        for report in reports
+        if report.get("report_type") == "incomplete_execution_hypothesis"
+    ]
+
+    chains = [completed_chain(report) for report in completed_reports]
+    chains.sort(
+        key=lambda chain: (
+            chain.get("time", {}).get("start") is None,
+            chain.get("time", {}).get("start") or 0,
+            str(chain.get("service", "")),
+            str(chain.get("chain_id", "")),
+        )
+    )
+
+    timeline: list[dict[str, Any]] = []
+    for chain in chains:
+        for event in chain["runtime_logs"]:
+            timeline.append(
+                {
+                    "timestamp": event.get("timestamp"),
+                    "service": chain.get("service"),
+                    "chain_id": chain.get("chain_id"),
+                    "bucket": event.get("bucket"),
+                    "message": event.get("message"),
+                    "structurally_unexplained": False,
+                }
             )
-            write_partial_index(report_index, reports_dir, final=False)
 
-        if checkpoint_every > 0 and processed_count % checkpoint_every == 0:
-            write_audit(catalogs, reports_dir)
+    for report in unexplained_reports:
+        event = report.get("runtime_event", {})
+        timeline.append(
+            {
+                "timestamp": event.get("timestamp"),
+                "service": report.get("service"),
+                "chain_id": None,
+                "bucket": event.get("bucket"),
+                "message": event.get("message"),
+                "structurally_unexplained": True,
+                "reason": report.get("classification", {}).get("reason"),
+            }
+        )
 
-    return report_index
+    timeline.sort(key=sort_key_timestamp)
+
+    return {
+        "schema_version": "3.0",
+        "description": (
+            "Injection-centered runtime analysis. Every chain contains a "
+            "runtime-constrained FLOW slice with original code snippets in "
+            "flow.methods[*].nodes[*].call_code."
+        ),
+        "incident_window": {
+            "inject_time": inject_time,
+            "start_timestamp": start_time,
+            "end_timestamp": end_time,
+            "before_sec": inject_time - start_time,
+            "after_sec": end_time - inject_time,
+        },
+        "analysis_window": {
+            "event_count": len(timeline),
+            "completed_chain_count": len(chains),
+            "services": sorted(
+                {
+                    item.get("service")
+                    for item in timeline
+                    if item.get("service")
+                }
+            ),
+        },
+        "chains": chains,
+        "timeline": timeline,
+        "unexplained_events": unexplained_reports,
+        "incomplete_hypotheses": incomplete_reports,
+        "metadata": {
+            "source_report_count": len(reports),
+            "completed_chain_count": len(chains),
+            "unexplained_event_count": len(unexplained_reports),
+            "incomplete_hypothesis_count": len(incomplete_reports),
+            "flow_contract": (
+                "chain.flow is the original runtime-constrained FLOW slice; "
+                "do not replace semantic units with method-only summaries."
+            ),
+        },
+    }
 
 
 # --------------------------------------------------------------------------- #
@@ -365,11 +510,36 @@ def process_incrementally(
 
 def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Trie-first multi-service runtime analyzer with incremental report export."
+        description="Analyze one injection-centered log window and write one incident JSON artifact."
     )
+
     parser.add_argument("--artifacts-dir", type=Path, default=Path("output"))
     parser.add_argument("--logs", type=Path, required=True)
-    parser.add_argument("--reports-dir", type=Path, default=Path("output/runtime_reports"))
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("output/runtime_reports/incident_context.json"),
+        help="Single incident JSON output path",
+    )
+
+    parser.add_argument(
+        "--inject-time",
+        type=int,
+        required=True,
+        help="Unix timestamp of the manually supplied fault injection time",
+    )
+    parser.add_argument(
+        "--before-sec",
+        type=int,
+        default=10,
+        help="Seconds retained before injection (default: 10)",
+    )
+    parser.add_argument(
+        "--after-sec",
+        type=int,
+        default=60,
+        help="Seconds retained after injection (default: 60)",
+    )
 
     parser.add_argument("--timestamp-column", default=None)
     parser.add_argument("--service-column", default=None)
@@ -383,19 +553,16 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--max-hypotheses-per-chain", type=int, default=16)
     parser.add_argument("--max-total-active-hypotheses", type=int, default=512)
     parser.add_argument("--max-call-depth", type=int, default=3)
-    parser.add_argument("--emit-incomplete", action="store_true")
-
+    parser.add_argument(
+        "--emit-incomplete",
+        action="store_true",
+        help="Include end-of-window incomplete hypotheses in incident_context.json",
+    )
     parser.add_argument(
         "--progress-every",
         type=int,
         default=1_000,
-        help="Print progress and save index.partial.json every N events",
-    )
-    parser.add_argument(
-        "--checkpoint-every",
-        type=int,
-        default=10_000,
-        help="Save audit chain/hypothesis CSV snapshots every N events",
+        help="Print progress every N processed incident-window logs",
     )
     parser.add_argument("-v", "--verbose", action="store_true")
     return parser.parse_args(argv)
@@ -403,35 +570,65 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
 
 def main(argv: Iterable[str] | None = None) -> int:
     args = parse_args(argv)
+
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",
         datefmt="%H:%M:%S",
     )
 
+    if not args.logs.is_file():
+        raise FileNotFoundError(f"Runtime log CSV does not exist: {args.logs}")
+
     catalogs = load_catalogs(args.artifacts_dir, args)
-    logs = prepare_logs(pd.read_csv(args.logs), args)
-    logger.info("Loaded runtime log events: %d", len(logs))
+    all_logs = prepare_logs(pd.read_csv(args.logs), args)
+    logs, window_start, window_end = filter_incident_window(
+        logs=all_logs,
+        inject_time=args.inject_time,
+        before_sec=args.before_sec,
+        after_sec=args.after_sec,
+    )
+
+    logger.info(
+        "Incident window: inject=%d range=[%d, %d] before=%ds after=%ds logs=%d/%d",
+        args.inject_time,
+        window_start,
+        window_end,
+        args.before_sec,
+        args.after_sec,
+        len(logs),
+        len(all_logs),
+    )
 
     processor = RuntimeStreamProcessor(catalogs, max_call_depth=args.max_call_depth)
-    report_index = process_incrementally(
+    reports = process_window(
         logs=logs,
         processor=processor,
-        catalogs=catalogs,
-        reports_dir=args.reports_dir,
         progress_every=args.progress_every,
-        checkpoint_every=args.checkpoint_every,
     )
 
     if args.emit_incomplete:
-        for report in processor.finalize():
-            report_index.append(
-                write_report_incrementally(report, args.reports_dir, len(report_index))
-            )
+        reports.extend(processor.finalize())
 
-    write_partial_index(report_index, args.reports_dir, final=True)
-    write_audit(catalogs, args.reports_dir)
-    logger.info("Done: logs=%d reports=%d output=%s", len(logs), len(report_index), args.reports_dir)
+    reports = deduplicate_reports(reports)
+    context = build_incident_context(
+        reports=reports,
+        inject_time=args.inject_time,
+        start_time=window_start,
+        end_time=window_end,
+    )
+
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(context, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    logger.info(
+        "Done: logs=%d reports=%d chains=%d unexplained=%d output=%s",
+        len(logs),
+        len(reports),
+        context["metadata"]["completed_chain_count"],
+        context["metadata"]["unexplained_event_count"],
+        args.output,
+    )
     return 0
 
 

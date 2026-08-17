@@ -139,3 +139,77 @@ def build_unexplained_report(
             "reason": "No active-hypothesis continuation or FSM start transition matched the event.",
         },
     }
+
+def build_llm_chain_summary(service, chain, hypothesis, fsm, flow):
+    started = min(
+        (log.timestamp for log in hypothesis.logs if log.timestamp is not None),
+        default=chain.created_at,
+    )
+
+    ended = max(
+        (log.timestamp for log in hypothesis.logs if log.timestamp is not None),
+        default=chain.last_timestamp,
+    )
+
+    calls = []
+    seen_methods = set()
+
+    def add_call(method, kind, condition=None, source_method=None):
+        if method in seen_methods:
+            return
+
+        seen_methods.add(method)
+
+        calls.append({
+            "order": len(calls) + 1,
+            "method": method,
+            "kind": kind,
+            "condition": condition,
+            "source_method": source_method,
+        })
+
+    add_call(fsm.entrypoint_full_name, "entrypoint")
+
+    for state_id in hypothesis.state_path:
+        segment = fsm.states.get(state_id)
+
+        if segment is None:
+            continue
+
+        for method in segment.direct_methods:
+            add_call(
+                method=method,
+                kind="internal_call",
+                condition=" | ".join(segment.conditions) or None,
+            )
+
+        for method in segment.external_calls:
+            add_call(
+                method=method,
+                kind="external_call",
+            )
+
+    return {
+        "chain_id": chain.chain_id,
+        "service": service,
+        "entrypoint": fsm.entrypoint_full_name,
+        "status": hypothesis.status,
+        "time": {
+            "start": started,
+            "end": ended,
+            "duration_ms": (
+                (ended - started) * 1000
+                if started is not None and ended is not None
+                else None
+            ),
+        },
+        "call_order_type": "static_path_order",
+        "calls": calls,
+        "runtime_logs": [
+            {
+                "timestamp": log.timestamp,
+                "message": log.message,
+            }
+            for log in hypothesis.logs
+        ],
+    }
