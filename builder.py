@@ -13,7 +13,6 @@ import src.offline.log as cpg_parser
 from src.offline.entrypoint import EntrypointDetector
 from src.offline.flow import EntrypointFlow
 from src.offline.finite_state_machine import LogFlowExtractor
-from src.visual.trie import visualize_trie_matplotlib
 
 logger = logging.getLogger("builder")
 
@@ -77,9 +76,6 @@ def build_log_trie(graph: nx.MultiDiGraph, output_dir: Path, max_ddg_depth: int 
     templates = cpg_parser.build_templates_from_cpg(graph, max_ddg_depth=max_ddg_depth)
     root = cpg_parser.build_trie(templates)
 
-    trie_png_path = output_dir / "trie.png"
-    visualize_trie_matplotlib(root, output_path=str(trie_png_path))
-
     trie_json_path = output_dir / "trie.json"
     trie_payload = {
         "templates_total": len(templates),
@@ -91,7 +87,7 @@ def build_log_trie(graph: nx.MultiDiGraph, output_dir: Path, max_ddg_depth: int 
         encoding="utf-8",
     )
 
-    logger.info("Log Trie: %d шаблонов -> %s, %s", len(templates), trie_png_path, trie_json_path)
+    logger.info("Log Trie: %d шаблонов -> %s", len(templates), trie_json_path)
     return templates, root
 
 
