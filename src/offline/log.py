@@ -56,6 +56,33 @@ CDG_LABEL = "CDG"
 METHOD_LABEL = "METHOD"
 WILDCARD = "<*>"
 STRING_RE = re.compile(r'["`\'](.*?)["`\']', re.DOTALL)
+# Format placeholders. A literal is only rewritten when the CPG shows that it is
+# the format string of a formatting call (see _format_style); otherwise the
+# characters are ordinary text. Each placeholder becomes WILDCARD, together with
+# the word characters glued to it ("%dms" -> one wildcard, so "took 12ms" matches).
+#   printf: String.format and Go fmt / logrus "...f" calls: %s %d %v %+v %q %5.2f %1$s %tY
+#   java:   "{}" in a Java log4j / SLF4J logger call ("{0}" is not a placeholder there)
+#   python: "{}" and "{0}" in 'text {}'.format(...); "{{" and "}}" are literal braces
+# "%%" and "%n" are not arguments; they are removed first so that no argument match
+# can start before them or run across them.
+_AFFIX = r"[\w-]*"
+PRINTF_SKIP_RE = re.compile(r"%[%n]")
+PLACEHOLDER_RES = {
+    "printf": re.compile(
+        _AFFIX
+        + r"%(?:\d+\$)?[-#+0,(]*(?:\*|\d+)?(?:\.(?:\*|\d+))?(?:[tT][a-zA-Z]|[a-zA-Z])"
+        + _AFFIX
+    ),
+    "java": re.compile(_AFFIX + r"\{\}" + _AFFIX),
+    "python": re.compile(r"(?P<esc>\{\{|\}\})|" + _AFFIX + r"\{\d*\}" + _AFFIX),
+}
+PRINTF_CALL_NAMES: Set[str] = {"format", "sprintf", "fprintf", "wrapf"}
+# Java logger methods that take a "{}" message (log4j, SLF4J), not print/write.
+# "{}" is substituted only when arguments follow the message, and java.util.logging
+# does not substitute "{}" at all.
+BRACE_LOGGER_NAMES: Set[str] = {"info", "warn", "warning", "debug", "error", "trace", "fatal", "log"}
+# Survives _clean_text_selective(), which removes all punctuation.
+_PLACEHOLDER_MARK = "\x00"
 LITERAL_LABELS: Set[str] = {
     "LITERAL",
     "STRING",
@@ -227,12 +254,88 @@ def _clean_text_selective(text: str) -> str:
     return text
 
 
+def _mark_placeholders(text: str, style: Optional[str]) -> str:
+    """Replace placeholders of the given style ("printf" / "java" / "python") with a
+    mark that cleaning keeps as its own token. Other text is returned unchanged."""
+    regex = PLACEHOLDER_RES.get(style)
+    if regex is None:
+        return text
+    if style == "printf":
+        text = PRINTF_SKIP_RE.sub(" ", text)
+    return regex.sub(
+        lambda m: " " if m.groupdict().get("esc") else f" {_PLACEHOLDER_MARK} ", text
+    )
+
+
 def _normalize_code_selective(s: str) -> str:
     """Normalize CODE attributes with selective cleaning"""
     s = str(s)
     s = s.strip().strip("'\"")
     s = _clean_text_selective(s)
     return s
+
+
+# ---------------------------------------------------------------------------
+# Is a literal the format string of a formatting call?
+# ---------------------------------------------------------------------------
+
+
+def _ast_parents(G: nx.MultiDiGraph, nid) -> List:
+    return [
+        u
+        for u, _, d in G.in_edges(nid, data=True)
+        if _clean(d.get("label", "")).upper() == AST_LABEL
+    ]
+
+
+def _format_style(G: nx.MultiDiGraph, nid) -> Optional[str]:
+    """Return "printf", "java" or "python" if literal `nid` is formatted, else None.
+
+    Decided from the parent call in the CPG, not from the text:
+    - parent named String.format / Sprintf / Errorf / Infof ... -> printf
+    - Java logger call (log4j / SLF4J "{}") -> java
+    - Python 'text {}'.format(x), which Joern lowers to `tmp = 'text {}'` followed by
+      `tmp.format(x)` in the same block -> python
+    Python logger calls, Python "%" and anything else are left as plain text.
+    """
+    code = _plain(_code(G, nid))
+    for parent in _ast_parents(G, nid):
+        name = _clean(G.nodes[parent].get("NAME", "")).lower()
+        if name in PRINTF_CALL_NAMES or (name in LOG_METHOD_NAMES and name.endswith("f")):
+            return "printf"
+        if name in BRACE_LOGGER_NAMES and _is_java(G, parent) and _has_args_after(G, parent, nid):
+            return "java"
+        if name == "<operator>.assignment":
+            for block in _ast_parents(G, parent):
+                for sibling in _ast_children(G, block):
+                    if _label(G, sibling) == CALL_LABEL and _plain(_code(G, sibling)).startswith(
+                        code + ".format("
+                    ):
+                        return "python"
+    return None
+
+
+def _plain(code: str) -> str:
+    """CODE without quotes and backslashes, so a literal and its call compare equal."""
+    return re.sub(r'[\\"]', "", code)
+
+
+def _has_args_after(G: nx.MultiDiGraph, call_nid, literal_nid) -> bool:
+    """True if the call has an argument after the literal and is not java.util.logging."""
+    if _clean(G.nodes[call_nid].get("METHOD_FULL_NAME", "")).startswith("java.util.logging"):
+        return False
+    def index(n):
+        try:
+            return int(str(G.nodes[n].get("ARGUMENT_INDEX", "")).strip('"'))
+        except ValueError:
+            return -1
+    return any(index(a) > index(literal_nid) for a in _arg_nodes(G, call_nid))
+
+
+def _is_java(G: nx.MultiDiGraph, call_nid) -> bool:
+    _, method_id = _find_parent_method(G, call_nid)
+    filename = _clean(G.nodes[method_id].get("FILENAME", "")) if method_id in G else ""
+    return filename.endswith(".java")
 
 
 # ---------------------------------------------------------------------------
@@ -259,6 +362,8 @@ def _backward_reaching_def(
         visited.add(nid)
         code = _code(G, nid)
         label = _label(G, nid)
+        if code and label in LITERAL_LABELS:
+            code = _mark_placeholders(code, _format_style(G, nid))
         if code:
             result.append((code, label, variable))
 
@@ -317,7 +422,7 @@ def _build_template(code_labels: List[Tuple[str, str, str]]) -> str:
                 parts.append(WILDCARD)
                 need_wildcard = False
 
-            words = code_clean.split()
+            words = [WILDCARD if w == _PLACEHOLDER_MARK else w for w in code_clean.split()]
             if words:
                 parts.extend(words)
             found_literal = True
