@@ -45,7 +45,7 @@ class TransitionMatch:
 @dataclass(frozen=True)
 class ChainLog:
     index: int
-    timestamp: Optional[int]
+    timestamp: Optional[pd.Timestamp]
     bucket: str
     message: str
     transition_id: str
@@ -75,8 +75,8 @@ class ActiveChain:
 
     chain_id: int
     fsm_key: str
-    created_at: Optional[int]
-    last_timestamp: Optional[int]
+    created_at: Optional[pd.Timestamp]
+    last_timestamp: Optional[pd.Timestamp]
     hypotheses: Dict[int, PathHypothesis] = field(default_factory=dict)
     status: str = "active"
     termination_reason: str = ""
@@ -102,7 +102,7 @@ class ActiveChain:
 @dataclass(frozen=True)
 class HypothesisEvent:
     index: int
-    timestamp: Optional[int]
+    timestamp: Optional[pd.Timestamp]
     bucket: str
     message: str
     chain_id: Optional[int]
@@ -164,7 +164,7 @@ class ExplicitHypothesisStore:
         self,
         fsms: Dict[str, StaticLogFSM],
         threshold: float = 0.55,
-        time_gap_sec: int = 30,
+        time_gap_sec: float = 30,
         max_active_chains: int = 512,
         max_hypotheses_per_chain: int = 32,
         max_total_active_hypotheses: int = 2048,
@@ -224,13 +224,13 @@ class ExplicitHypothesisStore:
             ))
         return result
 
-    def _expire(self, timestamp: Optional[int]) -> None:
+    def _expire(self, timestamp: Optional[pd.Timestamp]) -> None:
         if timestamp is None:
             return
         for chain in self.active_chains.values():
             if chain.status != "active" or chain.last_timestamp is None:
                 continue
-            if timestamp - chain.last_timestamp <= self.time_gap_sec:
+            if timestamp - chain.last_timestamp <= pd.Timedelta(seconds=self.time_gap_sec):
                 continue
             for hypothesis in chain.active_hypotheses:
                 hypothesis.status = "expired"
@@ -271,7 +271,7 @@ class ExplicitHypothesisStore:
         ]
         if len(active) <= self.max_total_active_hypotheses:
             return
-        active.sort(key=lambda item: (item[1].score, item[0].last_timestamp or -1), reverse=True)
+        active.sort(key=lambda item: (item[1].score, item[0].last_timestamp is not None, item[0].last_timestamp), reverse=True)
         for chain, hypothesis in active[self.max_total_active_hypotheses:]:
             hypothesis.status = "pruned"
             hypothesis.termination_reason = "global_hypothesis_limit"
@@ -281,7 +281,7 @@ class ExplicitHypothesisStore:
         chains = [chain for chain in self.active_chains.values() if chain.status == "active"]
         if len(chains) <= self.max_active_chains:
             return
-        chains.sort(key=lambda chain: (chain.score, chain.last_timestamp or -1), reverse=True)
+        chains.sort(key=lambda chain: (chain.score, chain.last_timestamp is not None, chain.last_timestamp), reverse=True)
         for chain in chains[self.max_active_chains:]:
             for hypothesis in chain.active_hypotheses:
                 hypothesis.status = "pruned"
@@ -295,7 +295,7 @@ class ExplicitHypothesisStore:
         parent: Optional[PathHypothesis],
         match: TransitionMatch,
         index: int,
-        timestamp: Optional[int],
+        timestamp: Optional[pd.Timestamp],
         bucket: str,
         message: str,
     ) -> PathHypothesis:
@@ -327,7 +327,7 @@ class ExplicitHypothesisStore:
         self,
         chain: ActiveChain,
         index: int,
-        timestamp: Optional[int],
+        timestamp: Optional[pd.Timestamp],
         bucket: str,
         message: str,
         observed_call_node_ids: Optional[set[str]],
@@ -384,7 +384,7 @@ class ExplicitHypothesisStore:
         fsm_key: str,
         matches: List[TransitionMatch],
         index: int,
-        timestamp: Optional[int],
+        timestamp: Optional[pd.Timestamp],
         bucket: str,
         message: str,
     ) -> tuple[ActiveChain, List[HypothesisEvent]]:
@@ -416,7 +416,7 @@ class ExplicitHypothesisStore:
     def process(
         self,
         message: str,
-        timestamp: Optional[int] = None,
+        timestamp: Optional[pd.Timestamp] = None,
         bucket: str = "",
         index: int = -1,
         observed_call_node_id: Optional[str] = None,
@@ -465,8 +465,8 @@ class ExplicitHypothesisStore:
         """Compatibility batch API; Trie integration is handled by stream_processor."""
         rows: List[Dict[str, Any]] = []
         for index, row in logs.sort_values(timestamp_column).reset_index(drop=True).iterrows():
-            raw_timestamp = row.get(timestamp_column)
-            timestamp = int(raw_timestamp) if pd.notna(raw_timestamp) else None
+            timestamp = row.get(timestamp_column)
+            timestamp = timestamp if pd.notna(timestamp) else None
             call_id = str(row[call_node_column]) if call_node_column and pd.notna(row.get(call_node_column)) else None
             for event in self.process(
                 message=str(row.get(message_column, "")), timestamp=timestamp,
@@ -522,7 +522,7 @@ def classify_logs_with_chain_store(
     logs: pd.DataFrame,
     fsms: Dict[str, StaticLogFSM],
     threshold: float = 0.55,
-    time_gap_sec: int = 30,
+    time_gap_sec: float = 30,
     max_active_chains: int = 512,
     max_hypotheses_per_chain: int = 32,
     max_total_active_hypotheses: int = 2048,
@@ -538,9 +538,9 @@ def classify_logs_with_chain_store(
 classifylogswithchainstore = classify_logs_with_chain_store
 
 
-def extract_logs(dataset_path: str, service: str, start_time: int, end_time: int) -> List[Tuple[int, str, str]]:
+def extract_logs(dataset_path: str, service: str, start_time: int, end_time: int) -> List[Tuple[pd.Timestamp, str, str]]:
     """Read timestamp, service, message CSV rows for one service and time window."""
-    logs: List[Tuple[int, str, str]] = []
+    logs: List[Tuple[pd.Timestamp, str, str]] = []
     try:
         with open(dataset_path, "r", encoding="utf-8") as handle:
             reader = csv.reader(handle)
@@ -549,15 +549,16 @@ def extract_logs(dataset_path: str, service: str, start_time: int, end_time: int
                 if len(row) < 3:
                     continue
                 try:
-                    timestamp = int(float(row[0]))
+                    seconds = int(float(row[0]))
                 except (ValueError, IndexError):
                     continue
-                if row[1].strip().lower() == service.lower() and start_time <= timestamp <= end_time:
-                    logs.append((timestamp, f"{row[1].strip()}@{timestamp}", row[2].strip()))
+                if row[1].strip().lower() == service.lower() and start_time <= seconds <= end_time:
+                    timestamp = pd.to_datetime(seconds, unit="s", utc=True)
+                    logs.append((timestamp, f"{row[1].strip()}@{seconds}", row[2].strip()))
     except FileNotFoundError:
         print(f"ERROR: Dataset file not found: {dataset_path}")
     return logs
 
 
-def logs_to_df(logs: List[Tuple[int, str, str]]) -> pd.DataFrame:
+def logs_to_df(logs: List[Tuple[pd.Timestamp, str, str]]) -> pd.DataFrame:
     return pd.DataFrame(logs, columns=["timestamp", "bucket", "message"])

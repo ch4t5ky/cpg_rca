@@ -251,18 +251,25 @@ def prepare_logs(raw: pd.DataFrame, args: argparse.Namespace) -> pd.DataFrame:
 
     logs = pd.DataFrame(
         {
-            "timestamp": pd.to_numeric(raw[timestamp_column], errors="coerce"),
+            "timestamp": pd.to_datetime(
+                pd.to_numeric(raw[timestamp_column], errors="coerce", dtype_backend="numpy_nullable"),
+                unit=args.timestamp_unit,
+                utc=True,
+            ).dt.as_unit("ns"),  # integer input would otherwise keep unit s/us and break the bucket below
             "service": raw[service_column].astype(str).str.strip(),
             "message": raw[message_column].astype(str),
         }
     )
+    dropped = int(logs["timestamp"].isna().sum())
+    if dropped:
+        logger.warning("Dropping %d rows with missing or invalid timestamps", dropped)
     logs = logs[logs["timestamp"].notna()].copy()
-    logs["timestamp"] = logs["timestamp"].astype("int64")
 
     if bucket_column:
         logs["bucket"] = raw.loc[logs.index, bucket_column].astype(str)
     else:
-        logs["bucket"] = logs["service"] + "@" + logs["timestamp"].astype(str)
+        seconds = logs["timestamp"].astype("int64") // 1_000_000_000
+        logs["bucket"] = logs["service"] + "@" + seconds.astype(str)
 
     if call_node_column:
         logs["call_node_id"] = raw.loc[logs.index, call_node_column]
@@ -280,16 +287,16 @@ def prepare_logs(raw: pd.DataFrame, args: argparse.Namespace) -> pd.DataFrame:
 
 def filter_incident_window(
     logs: pd.DataFrame,
-    inject_time: int,
+    inject_time: pd.Timestamp,
     before_sec: int,
     after_sec: int,
-) -> tuple[pd.DataFrame, int, int]:
+) -> tuple[pd.DataFrame, pd.Timestamp, pd.Timestamp]:
     """Keep only rows in [inject_time - before_sec, inject_time + after_sec]."""
     if before_sec < 0 or after_sec < 0:
         raise ValueError("--before-sec and --after-sec must be non-negative.")
 
-    start_time = inject_time - before_sec
-    end_time = inject_time + after_sec
+    start_time = inject_time - pd.Timedelta(seconds=before_sec)
+    end_time = inject_time + pd.Timedelta(seconds=after_sec)
     filtered = logs.loc[
         logs["timestamp"].between(start_time, end_time, inclusive="both")
     ].copy()
@@ -327,7 +334,7 @@ def process_window(
 
         event = RuntimeEvent(
             index=int(row["__original_index"]),
-            timestamp=int(row["timestamp"]),
+            timestamp=row["timestamp"],
             service=str(row["service"]),
             bucket=str(row["bucket"]),
             message=str(row["message"]),
@@ -386,21 +393,28 @@ def completed_chain(report: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def sort_key_timestamp(item: dict[str, Any]) -> tuple[bool, int, str]:
+def json_default(value: Any) -> str:
+    """Write timestamps to JSON as ISO 8601 strings."""
+    if isinstance(value, pd.Timestamp):
+        return value.isoformat()
+    raise TypeError(f"Cannot serialize type {type(value).__name__}")
+
+
+def sort_key_timestamp(item: dict[str, Any]) -> tuple[bool, Any, str]:
     """Stable sort key for timeline entries with optional timestamps."""
     timestamp = item.get("timestamp")
     return (
         timestamp is None,
-        int(timestamp) if timestamp is not None else 0,
+        timestamp if timestamp is not None else 0,
         str(item.get("service", "")),
     )
 
 
 def build_incident_context(
     reports: list[dict[str, Any]],
-    inject_time: int,
-    start_time: int,
-    end_time: int,
+    inject_time: pd.Timestamp,
+    start_time: pd.Timestamp,
+    end_time: pd.Timestamp,
 ) -> dict[str, Any]:
     """Build one LLM artifact without compacting FLOW semantic-unit code."""
     completed_reports = [
@@ -463,7 +477,7 @@ def build_incident_context(
     timeline.sort(key=sort_key_timestamp)
 
     return {
-        "schema_version": "3.0",
+        "schema_version": "4.0",
         "description": (
             "Injection-centered runtime analysis. Every chain contains a "
             "runtime-constrained FLOW slice with original code snippets in "
@@ -473,8 +487,8 @@ def build_incident_context(
             "inject_time": inject_time,
             "start_timestamp": start_time,
             "end_timestamp": end_time,
-            "before_sec": inject_time - start_time,
-            "after_sec": end_time - inject_time,
+            "before_sec": (inject_time - start_time).total_seconds(),
+            "after_sec": (end_time - inject_time).total_seconds(),
         },
         "analysis_window": {
             "event_count": len(timeline),
@@ -524,7 +538,7 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
 
     parser.add_argument(
         "--inject-time",
-        type=int,
+        type=float,
         required=True,
         help="Unix timestamp of the manually supplied fault injection time",
     )
@@ -542,13 +556,14 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     )
 
     parser.add_argument("--timestamp-column", default=None)
+    parser.add_argument("--timestamp-unit", choices=("s", "ms", "us", "ns"), default="s")
     parser.add_argument("--service-column", default=None)
     parser.add_argument("--message-column", default=None)
     parser.add_argument("--bucket-column", default=None)
     parser.add_argument("--call-node-column", default=None)
 
     parser.add_argument("--threshold", type=float, default=0.55)
-    parser.add_argument("--time-gap-sec", type=int, default=30)
+    parser.add_argument("--time-gap-sec", type=float, default=30)
     parser.add_argument("--max-active-chains", type=int, default=128)
     parser.add_argument("--max-hypotheses-per-chain", type=int, default=16)
     parser.add_argument("--max-total-active-hypotheses", type=int, default=512)
@@ -581,17 +596,18 @@ def main(argv: Iterable[str] | None = None) -> int:
         raise FileNotFoundError(f"Runtime log CSV does not exist: {args.logs}")
 
     catalogs = load_catalogs(args.artifacts_dir, args)
-    all_logs = prepare_logs(pd.read_csv(args.logs), args)
+    all_logs = prepare_logs(pd.read_csv(args.logs, dtype=str), args)
+    inject_time = pd.to_datetime(args.inject_time, unit="s", utc=True)
     logs, window_start, window_end = filter_incident_window(
         logs=all_logs,
-        inject_time=args.inject_time,
+        inject_time=inject_time,
         before_sec=args.before_sec,
         after_sec=args.after_sec,
     )
 
     logger.info(
-        "Incident window: inject=%d range=[%d, %d] before=%ds after=%ds logs=%d/%d",
-        args.inject_time,
+        "Incident window: inject=%s range=[%s, %s] before=%ss after=%ss logs=%d/%d",
+        inject_time,
         window_start,
         window_end,
         args.before_sec,
@@ -613,13 +629,13 @@ def main(argv: Iterable[str] | None = None) -> int:
     reports = deduplicate_reports(reports)
     context = build_incident_context(
         reports=reports,
-        inject_time=args.inject_time,
+        inject_time=inject_time,
         start_time=window_start,
         end_time=window_end,
     )
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(context, ensure_ascii=False, indent=2), encoding="utf-8")
+    args.output.write_text(json.dumps(context, ensure_ascii=False, indent=2, default=json_default), encoding="utf-8")
 
     logger.info(
         "Done: logs=%d reports=%d chains=%d unexplained=%d output=%s",
