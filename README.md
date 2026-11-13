@@ -19,6 +19,7 @@
   - [Index and summary files](#index-and-summary-files)
 - [Core Modules](#core-modules)
 - [Notebook: interactive exploration](#notebook-interactive-exploration)
+- [Log observability coverage](#log-observability-coverage)
 - [Notes and Known Limitations](#notes-and-known-limitations)
 
 ## Description
@@ -172,3 +173,12 @@ Optionally, `<entrypoint>.fsm.png` (Graphviz) when `--render-graphviz` is set.
 ## Notebook: interactive exploration
 
 `rca.ipynb` mirrors the same pipeline interactively for a single service at a time — useful for inspecting intermediate structures (raw CPG, individual `SemanticFlowGraph`s, FSM transitions) and for prototyping runtime log classification against a built FSM catalog before promoting logic into `builder.py`.
+
+## Log observability coverage
+
+`eval/coverage.py` counts, per service and per entrypoint, the logger calls reachable through FLOW, the ones that are transitions of the entrypoint FSM (visible) and the rest (lost, in a callee or in the entry method). Entrypoints without a visible log are counted as zero-log. Definitions are in its docstring. It reads the `builder.py` output and needs only the standard library.
+
+```bash
+python3 -m eval.coverage output coverage/new   # writes coverage.json and coverage.md
+python3 -m eval.compare coverage/old/coverage.json coverage/new/coverage.json   # exit 1 if visible decreases or lost increases
+```
