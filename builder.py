@@ -168,12 +168,13 @@ def build_entrypoint_artifacts(
     templates,
     output_dir: Path,
     flow_max_depth: int = 5,
-    flow_max_paths: int = 50
+    flow_max_paths: int = 50,
+    skip_non_request: bool = False,
 ) -> list[dict]:
     """Строит FLOW и FSM для каждого entrypoint'а сервиса, сохраняет JSON (и PNG опционально)."""
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    detector = EntrypointDetector(graph)
+    detector = EntrypointDetector(graph, skip_non_request=skip_non_request)
     all_entrypoints = detector.detect()
     logger.info("Найдено %d entrypoint(s)", len(all_entrypoints))
 
@@ -263,7 +264,8 @@ def process_service(
     output_root: Path,
     max_ddg_depth: int = 5,
     flow_max_depth: int = 5,
-    flow_max_paths: int = 50
+    flow_max_paths: int = 50,
+    skip_non_request: bool = False,
 ) -> dict:
     """Полный пайплайн обработки одного сервиса: CPG -> Log Trie + FLOW + FSM."""
     logger.info("=== Сервис: %s ===", service_name)
@@ -279,6 +281,7 @@ def process_service(
         output_dir=output_dir,
         flow_max_depth=flow_max_depth,
         flow_max_paths=flow_max_paths,
+        skip_non_request=skip_non_request,
     )
 
     summary = {
@@ -308,7 +311,8 @@ def process_services_dir(
     only_service: str | None = None,
     max_ddg_depth: int = 5,
     flow_max_depth: int = 5,
-    flow_max_paths: int = 50
+    flow_max_paths: int = 50,
+    skip_non_request: bool = False,
 ) -> list[dict]:
     """Обходит все сервисы в services_dir и обрабатывает каждый export.dot."""
     dot_files = discover_services(services_dir)
@@ -328,7 +332,8 @@ def process_services_dir(
                 output_root=output_root,
                 max_ddg_depth=max_ddg_depth,
                 flow_max_depth=flow_max_depth,
-                flow_max_paths=flow_max_paths
+                flow_max_paths=flow_max_paths,
+                skip_non_request=skip_non_request,
             )
         except Exception as error:  # noqa: BLE001 - не прерываем обработку остальных сервисов
             logger.exception("Сбой при обработке сервиса %s", service_name)
@@ -365,6 +370,10 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--max-ddg-depth", type=int, default=5, help="Глубина DDG для лог-шаблонов")
     parser.add_argument("--flow-max-depth", type=int, default=5, help="Максимальная глубина FLOW-обхода")
     parser.add_argument("--flow-max-paths", type=int, default=50, help="Максимум путей в FLOW-обходе")
+    parser.add_argument(
+        "--skip-non-request-entrypoints", action="store_true",
+        help="Игнорировать тесты и сгенерированный код, скрыть main/init/__init__ (по умолчанию выключено)",
+    )
     parser.add_argument("-v", "--verbose", action="store_true", help="Подробный вывод (DEBUG)")
     return parser.parse_args(argv)
 
@@ -386,7 +395,8 @@ def main(argv: Iterable[str] | None = None) -> int:
         only_service=args.service,
         max_ddg_depth=args.max_ddg_depth,
         flow_max_depth=args.flow_max_depth,
-        flow_max_paths=args.flow_max_paths
+        flow_max_paths=args.flow_max_paths,
+        skip_non_request=args.skip_non_request_entrypoints,
     )
 
     ok = sum(1 for s in summaries if s.get("entrypoints_error", 0) == 0 and "error" not in s)

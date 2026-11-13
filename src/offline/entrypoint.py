@@ -1,9 +1,20 @@
 import html
 
 from dataclasses import dataclass
+from fnmatch import fnmatchcase
 from typing import Dict, List, Tuple
 
 import networkx as nx
+
+# Used only with skip_non_request=True. Case-sensitive globs on "/" + FILENAME.
+# Test and generated files are not reported and not counted as callers, so a
+# test does not hide the handler it calls (a Go TestGetQuote "calls" GetQuote).
+NON_REQUEST_FILES: Tuple[str, ...] = (
+    "*_test.go", "*_test.py", "*/test_*.py", "*Test.java", "*Tests.java",
+    "*/test/*", "*/tests/*", "*.pb.go", "*_pb2.py", "*_pb2_grpc.py",
+)
+# Start-up methods: hidden by NAME only, but still counted as callers.
+NON_REQUEST_NAMES: Tuple[str, ...] = ("main", ":program", "init", "__init__")
 
 
 @dataclass
@@ -22,10 +33,13 @@ class EntrypointDetector:
     ----------
     G : nx.MultiDiGraph
         CPG graph (loaded from .dot via pydot + networkx).
+    skip_non_request : bool
+        Apply NON_REQUEST_FILES and NON_REQUEST_NAMES. Default: off.
     """
 
-    def __init__(self, G: nx.MultiDiGraph) -> None:
+    def __init__(self, G: nx.MultiDiGraph, skip_non_request: bool = False) -> None:
         self._G = G
+        self._skip = skip_non_request
 
     # ── public API ────────────────────────────────────────────────────────────
 
@@ -42,6 +56,10 @@ class EntrypointDetector:
         if len(s) >= 2 and s[0] == s[-1] == '"':
             s = s[1:-1]
         return s
+
+    def _is_non_request_file(self, nid: str) -> bool:
+        path = "/" + self._attr(nid, "FILENAME")
+        return any(fnmatchcase(path, p) for p in NON_REQUEST_FILES)
 
     # ── filter 1: build the set of internal METHOD nodes ─────────────────────
     #
@@ -124,13 +142,20 @@ class EntrypointDetector:
         cg: nx.DiGraph,
     ) -> List[Entrypoint]:
 
+        ignored = {nid for nid in cg.nodes if self._skip and self._is_non_request_file(nid)}
+
         result: List[Entrypoint] = []
         for nid in cg.nodes:
-            in_d = cg.in_degree(nid)
+            if nid in ignored:
+                continue
+            in_d = sum(1 for caller in cg.predecessors(nid) if caller not in ignored)
             out_d = cg.out_degree(nid)
 
             # Condition (1):  in_degree = 0  ∧  out_degree ≥ 1
             if in_d != 0 or out_d < 1:
+                continue
+
+            if self._skip and self._attr(nid, "NAME") in NON_REQUEST_NAMES:
                 continue
 
             result.append(
