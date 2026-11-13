@@ -30,7 +30,7 @@ class RuntimeEvent:
     """Canonical runtime event routed to one service-local online matcher."""
 
     index: int
-    timestamp: Optional[int]
+    timestamp: Optional[pd.Timestamp]
     service: str
     bucket: str
     message: str
@@ -203,8 +203,8 @@ class RuntimeStreamProcessor:
 
         reports: list[dict[str, Any]] = []
         for _, row in ordered.iterrows():
-            raw_timestamp = row.get(timestamp_column)
-            timestamp = int(raw_timestamp) if pd.notna(raw_timestamp) else None
+            timestamp = row.get(timestamp_column)
+            timestamp = timestamp if pd.notna(timestamp) else None
 
             call_node_id = None
             if (

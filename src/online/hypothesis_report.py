@@ -198,7 +198,7 @@ def build_llm_chain_summary(service, chain, hypothesis, fsm, flow):
             "start": started,
             "end": ended,
             "duration_ms": (
-                (ended - started) * 1000
+                (ended - started).total_seconds() * 1000
                 if started is not None and ended is not None
                 else None
             ),
