@@ -76,9 +76,6 @@ def build_log_trie(graph: nx.MultiDiGraph, output_dir: Path, max_ddg_depth: int 
     templates = cpg_parser.build_templates_from_cpg(graph, max_ddg_depth=max_ddg_depth)
     root = cpg_parser.build_trie(templates)
 
-    trie_png_path = output_dir / "trie.png"
-    cpg_parser.visualize_trie_matplotlib(root, output_path=str(trie_png_path))
-
     trie_json_path = output_dir / "trie.json"
     trie_payload = {
         "templates_total": len(templates),
@@ -90,7 +87,7 @@ def build_log_trie(graph: nx.MultiDiGraph, output_dir: Path, max_ddg_depth: int 
         encoding="utf-8",
     )
 
-    logger.info("Log Trie: %d шаблонов -> %s, %s", len(templates), trie_png_path, trie_json_path)
+    logger.info("Log Trie: %d шаблонов -> %s", len(templates), trie_json_path)
     return templates, root
 
 
