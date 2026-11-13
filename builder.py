@@ -178,9 +178,16 @@ def build_entrypoint_artifacts(
     fsm_extractor = LogFlowExtractor(templates)
 
     index: list[dict] = []
+    used_names: set[str] = set()
 
     for i, entrypoint in enumerate(all_entrypoints, start=1):
-        artifact_name = _safe_name(entrypoint.name)
+        # Same-named entrypoints (main, generated Descriptor) must not overwrite each other's files.
+        base = artifact_name = _safe_name(entrypoint.name)
+        copies = 0
+        while artifact_name.casefold() in used_names:  # casefold: macOS/Windows file systems
+            copies += 1
+            artifact_name = f"{base}__{copies}"
+        used_names.add(artifact_name.casefold())
         logger.info("[%d/%d] entrypoint: %s", i, len(all_entrypoints), entrypoint.name)
 
         try:

@@ -136,14 +136,14 @@ def load_service_catalog(service_dir: Path, args: argparse.Namespace) -> Service
     for fsm_path in sorted(service_dir.glob("*.fsm.json")):
         fsm = load_fsm(fsm_path)
         if fsm.transitions:
-            fsms[fsm.entrypoint_name] = fsm
+            # The file stem is unique per entrypoint; entrypoint names are not.
+            fsms[fsm_path.name.removesuffix(".fsm.json")] = fsm
         else:
             logger.debug("Skipping FSM without transitions: %s", fsm_path)
 
     for flow_path in sorted(service_dir.glob("*.flow.json")):
         flow = json.loads(flow_path.read_text(encoding="utf-8"))
-        entrypoint = str(flow.get("entrypoint_name") or flow_path.stem.removesuffix(".flow"))
-        flows[entrypoint] = flow
+        flows[flow_path.name.removesuffix(".flow.json")] = flow
 
     paired_fsms = {name: fsm for name, fsm in fsms.items() if name in flows}
     if not paired_fsms:

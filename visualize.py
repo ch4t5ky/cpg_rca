@@ -262,7 +262,9 @@ def render_service_artifacts(
 
     for flow_path in flow_paths:
         entrypoint_name, graphs = load_flow_graphs(flow_path)
-        entrypoint_output_dir = output_dir / "flow" / safe_name(entrypoint_name)
+        # Output paths come from the artifact file stem, which builder.py made unique and
+        # filesystem-safe; entrypoint names are not unique, and safe_name() could merge stems again.
+        entrypoint_output_dir = output_dir / "flow" / flow_path.name.removesuffix(".flow.json")
         logger.info("FLOW %s: rendering %d method graph(s)", entrypoint_name, len(graphs))
 
         for method_name, graph in graphs.items():
@@ -301,7 +303,7 @@ def render_service_artifacts(
             entrypoint_name = fsm.entrypoint_name or fsm_path.stem.removesuffix(".fsm")
             rendered_path = draw_log_fsm_graphviz(
                 fsm=fsm,
-                filename=safe_name(entrypoint_name),
+                filename=fsm_path.name.removesuffix(".fsm.json"),
                 output_dir=str(output_dir / "fsm"),
                 fmt=fmt,
                 rankdir=rankdir,
