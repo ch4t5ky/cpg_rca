@@ -104,6 +104,7 @@ def serialize_flow(flow_result) -> dict:
         "summary": flow_result.summary(),
         "cycle_warnings": flow_result.cycle_warnings,
         "max_depth_reached": flow_result.max_depth_reached,
+        "entrypoint_resolution": flow_result.entrypoint_resolution,
         "external_calls": [asdict(call) for call in flow_result.external_calls],
         "methods": {
             f"{method_name}": {
@@ -140,6 +141,7 @@ def serialize_fsm(fsm) -> dict:
         "entrypoint_full_name": fsm.entrypoint_full_name,
         "summary": fsm.summary(),
         "warnings": fsm.warnings,
+        "diagnostics": fsm.diagnostics,
         "start_states": sorted(fsm.start_states),
         "terminal_states": sorted(fsm.terminals),
         "states": [asdict(state) for state in fsm.states.values()],

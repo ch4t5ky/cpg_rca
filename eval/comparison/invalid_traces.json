@@ -1,0 +1,32 @@
+[
+  {
+    "case_id": "invalid-finish-without-attempt",
+    "events": ["operation started", "operation finished"],
+    "reason": "execute() always logs at least one 'attempt started' before 'operation finished' (for-loop body runs before finish)."
+  },
+  {
+    "case_id": "invalid-attempt-after-success",
+    "events": ["operation started", "attempt started", "operation succeeded", "attempt started", "operation finished"],
+    "reason": "the loop breaks after 'operation succeeded'; a further 'attempt started' can only follow 'temporary failure, retrying'."
+  },
+  {
+    "case_id": "invalid-success-after-failure-without-new-attempt",
+    "events": ["operation started", "attempt started", "temporary failure, retrying", "operation succeeded", "operation finished"],
+    "reason": "'temporary failure, retrying' is followed by `continue`: the next log must be a new 'attempt started', not 'operation succeeded'."
+  },
+  {
+    "case_id": "invalid-missing-operation-start",
+    "events": ["attempt started", "operation finished"],
+    "reason": "'attempt started' is logged only inside execute(), which always logs 'operation started' first."
+  },
+  {
+    "case_id": "invalid-truncated-mid-retry",
+    "events": ["operation started", "attempt started", "temporary failure, retrying"],
+    "reason": "an execution that logged 'temporary failure, retrying' must continue with a new attempt or 'retry budget exhausted'; the trace has no terminal."
+  },
+  {
+    "case_id": "invalid-duplicate-operation-start",
+    "events": ["operation started", "operation started"],
+    "reason": "'operation started' is logged exactly once per execute() call; the loop never returns to the method entry."
+  }
+]

@@ -20,6 +20,7 @@
 - [Core Modules](#core-modules)
 - [Notebook: interactive exploration](#notebook-interactive-exploration)
 - [Log observability coverage](#log-observability-coverage)
+- [Behavioural-model comparison experiment](#behavioural-model-comparison-experiment-evalcomparison)
 - [Notes and Known Limitations](#notes-and-known-limitations)
 
 ## Description
@@ -182,3 +183,113 @@ Optionally, `<entrypoint>.fsm.png` (Graphviz) when `--render-graphviz` is set.
 python3 -m eval.coverage output coverage/new   # writes coverage.json and coverage.md
 python3 -m eval.compare coverage/old/coverage.json coverage/new/coverage.json   # exit 1 if visible decreases or lost increases
 ```
+
+## Behavioural-model comparison experiment (eval/comparison)
+
+Подробное описание эксперимента — в **[eval/comparison/README.md](eval/comparison/README.md)**
+(протокол, метрики, запуск, выходы, текущие результаты). Кратко:
+
+`eval/comparison/run.py` compares the acceptance quality and speed of
+three behavioural-model builders on the synthetic test service
+`services/retryservice` (CPG at `services/retryservice/export.dot`).
+
+Everything the comparison needs lives under `eval/comparison/`:
+
+```
+eval/comparison/
+├── run.py                 # single entry point (this experiment)
+├── metrics.py             # acceptance-quality metrics (unit-tested)
+├── prins_train.py         # isolated-subprocess PRINS training
+├── invalid_traces.json    # independently labelled invalid traces
+├── data/fixture_data/     # train/test executions + hidden call-site oracle
+├── baselines/             # the competitor methods, vendored as-is
+│   ├── PRINS/             #   PRINS replication package (MINT inside)
+│   ├── LogSynthFSM-KDD-2026/  # LogSynthFSM package
+│   ├── prins_data.py      #   log loading/canonicalization helpers
+│   └── train_prins.py     #   PRINS training for dataset/re3ob incidents
+└── reports/               # generated results
+    └── full/              #   per_execution.csv, summary.csv, config.json
+                           #   + cpg_rca/, PRINS/, LogSynthFSM/ artifact folders
+```
+
+- **cpg_rca** — FSM built from the source-code CPG (`builder.py` offline pipeline);
+- **PRINS** — DFA inferred from the train logs by the vendored replication package
+  (`baselines/PRINS`, MINT + hybrid determinization), trained in an isolated
+  subprocess (`prins_train.py`) to avoid the `src` package-name
+  collision between the repo and PRINS;
+- **LogSynthFSM** — its FSM stage only: the package's own regex parsing +
+  LLM State Discovery (`baselines/LogSynthFSM-KDD-2026`). It requires an
+  LLM provider (`OPENAI_API_KEY` or ollama on `localhost:11434`, e.g.
+  `docker run -d -p 11434:11434 ollama/ollama` + `ollama pull <model>`);
+  when none is available it is reported as `blocked` — no substitute
+  implementation is used. The model name is taken from `OLLAMA_MODEL`
+  (default `llama3.1`).
+
+Protocol guarantees (see `config.json` of each run for versions, split, seeds):
+
+- identical train/test executions for all methods; only train data feeds the
+  log-based methods;
+- one shared observable alphabet: every message is canonicalized with
+  `normalize_message` (numbers/hex/uuids → `<*>`);
+- identical full-acceptance semantics: a trace is accepted iff the model consumes
+  *every* event from an initial state and ends in an accepting/terminal state —
+  no skipping. For LogSynthFSM (whose states carry no flags) start = states
+  without incoming transitions, terminal = states without outgoing ones;
+- invalid traces (`eval/comparison/invalid_traces.json`) are labelled from the
+  source-code semantics of `retry_service.py`, never from any evaluated FSM;
+  `retry budget exhausted` (ERROR) is a *valid* terminal scenario;
+- cpg_rca events are normalized at the matching layer with
+  `src/online/trie_matcher.normalize_text` — the same policy the online/runtime
+  stage applies to messages before template matching, so the evaluated pipeline
+  is the full cpg_rca (offline FSM + online matching); offline artefacts
+  (trie, FSM JSON) are unaffected by this matching-layer normalization.
+
+Metrics (`eval/comparison/metrics.py`, unit-tested in `tests/test_comparison_metrics.py`):
+Recall_valid (fully accepted valid traces), Specificity_invalid (rejected
+independently labelled invalid traces), Balanced Accuracy = (R+S)/2 on the
+`combined` block, separate Recall_valid for `known` (scenarios present in train)
+and `heldout` (test-only) groups, event coverage, build time, per-trace check
+time, and log-to-code matching accuracy of cpg_rca against the hidden call-site
+oracle (`oracle_events.jsonl`; N/A for the log-based methods).
+
+```bash
+python eval/comparison/run.py --retrain-prins    # comparison run (writes reports/full/)
+python -m pytest tests/ -q                         # unit tests (incl. metrics)
+```
+
+Outputs (per run, default `eval/comparison/reports/full/`):
+`per_execution.csv` (method, case_id, ground truth, decision, events processed,
+reject reason, check time), `summary.csv` (metric blocks with
+numerators/denominators plus a `speed` block), `config.json` (environment,
+split, seeds, per-method parameters and statuses), plus per-method artifact
+folders: `cpg_rca/` (`trie.json`, `fsm.json` — the built model),
+`PRINS/` (`prins_retryservice.pkl` + `.meta.json`, `vocab.json` — message→id
+mapping, `prins_work/` — MINT inputs/outputs), `LogSynthFSM/`
+(`logsynthfsm_work/` with parsed events and FSM CSVs when a provider is
+available).
+
+Latest results (RetryService, 80 valid + 6 invalid traces):
+
+Quality (balanced accuracy on the `combined` block):
+
+| Method | Recall_valid all | known | heldout | Specificity_invalid | BA |
+|---|---|---|---|---|---|
+| cpg_rca | 1.00 | 1.00 | 1.00 | 0.833 (5/6) | 0.917 |
+| PRINS (k=2, u=1) | 0.75 | 1.00 | 0.50 | 1.00 (6/6) | 0.875 |
+| LogSynthFSM (FSM-stage, ollama llama3.2:3b) | 0.75 | 1.00 | 0.50 | 1.00 (6/6) | 0.875 |
+
+Speed (`speed` block of `summary.csv`):
+
+| Method | Build, s | Check total, s | Check mean, s | Traces/s |
+|---|---|---|---|---|
+| cpg_rca | ~9.1 | ~0.0023 | ~2.6e-5 | ~3.8e4 |
+| PRINS | ~0.9–1.2 | ~0.0002 | ~2e-6 | ~2.4–4.3e5 |
+| LogSynthFSM | ~82 | ~0.004 | ~4.8e-5 | ~2.1e4 |
+
+Note on evaluation fairness: cpg_rca templates extracted from the CPG have
+punctuation removed, so acceptance checking normalizes events with the same
+online-stage policy (`trie_matcher.normalize_text`) before matching. Matching
+raw events against the raw FSM instead collapses cpg_rca's recall to 0.25
+(every retry trace dies on the punctuation-bearing event) while leaving PRINS
+unchanged — a matching-layer artifact, not a model-quality difference.
+

@@ -1,0 +1,286 @@
+{
+  "templates_total": 8,
+  "templates": [
+    {
+      "call_node_id": "30064771188",
+      "method_name": "emit",
+      "method_node_id": "107374182404",
+      "raw_template": "n <*>",
+      "tokens": [
+        "n",
+        "<*>"
+      ],
+      "static_count": 1
+    },
+    {
+      "call_node_id": "30064771195",
+      "method_name": "emit",
+      "method_node_id": "107374182404",
+      "raw_template": "n <*>",
+      "tokens": [
+        "n",
+        "<*>"
+      ],
+      "static_count": 1
+    },
+    {
+      "call_node_id": "30064771236",
+      "method_name": "execute",
+      "method_node_id": "107374182417",
+      "raw_template": "operation started <*>",
+      "tokens": [
+        "operation",
+        "started",
+        "<*>"
+      ],
+      "static_count": 2
+    },
+    {
+      "call_node_id": "30064771241",
+      "method_name": "execute",
+      "method_node_id": "107374182417",
+      "raw_template": "attempt started <*>",
+      "tokens": [
+        "attempt",
+        "started",
+        "<*>"
+      ],
+      "static_count": 2
+    },
+    {
+      "call_node_id": "30064771246",
+      "method_name": "execute",
+      "method_node_id": "107374182417",
+      "raw_template": "temporary failure retrying <*>",
+      "tokens": [
+        "temporary",
+        "failure",
+        "retrying",
+        "<*>"
+      ],
+      "static_count": 3
+    },
+    {
+      "call_node_id": "30064771248",
+      "method_name": "execute",
+      "method_node_id": "107374182417",
+      "raw_template": "retry budget exhausted <*>",
+      "tokens": [
+        "retry",
+        "budget",
+        "exhausted",
+        "<*>"
+      ],
+      "static_count": 3
+    },
+    {
+      "call_node_id": "30064771251",
+      "method_name": "execute",
+      "method_node_id": "107374182417",
+      "raw_template": "operation succeeded <*>",
+      "tokens": [
+        "operation",
+        "succeeded",
+        "<*>"
+      ],
+      "static_count": 2
+    },
+    {
+      "call_node_id": "30064771263",
+      "method_name": "execute",
+      "method_node_id": "107374182417",
+      "raw_template": "operation finished <*>",
+      "tokens": [
+        "operation",
+        "finished",
+        "<*>"
+      ],
+      "static_count": 2
+    }
+  ],
+  "trie": {
+    "terminals": [],
+    "children": {
+      "n": {
+        "terminals": [],
+        "children": {
+          "<*>": {
+            "terminals": [
+              {
+                "call_node_id": "30064771188",
+                "raw_template": "n <*>",
+                "tokens": [
+                  "n",
+                  "<*>"
+                ],
+                "static_count": 1
+              },
+              {
+                "call_node_id": "30064771195",
+                "raw_template": "n <*>",
+                "tokens": [
+                  "n",
+                  "<*>"
+                ],
+                "static_count": 1
+              }
+            ],
+            "children": {}
+          }
+        }
+      },
+      "operation": {
+        "terminals": [],
+        "children": {
+          "started": {
+            "terminals": [],
+            "children": {
+              "<*>": {
+                "terminals": [
+                  {
+                    "call_node_id": "30064771236",
+                    "raw_template": "operation started <*>",
+                    "tokens": [
+                      "operation",
+                      "started",
+                      "<*>"
+                    ],
+                    "static_count": 2
+                  }
+                ],
+                "children": {}
+              }
+            }
+          },
+          "succeeded": {
+            "terminals": [],
+            "children": {
+              "<*>": {
+                "terminals": [
+                  {
+                    "call_node_id": "30064771251",
+                    "raw_template": "operation succeeded <*>",
+                    "tokens": [
+                      "operation",
+                      "succeeded",
+                      "<*>"
+                    ],
+                    "static_count": 2
+                  }
+                ],
+                "children": {}
+              }
+            }
+          },
+          "finished": {
+            "terminals": [],
+            "children": {
+              "<*>": {
+                "terminals": [
+                  {
+                    "call_node_id": "30064771263",
+                    "raw_template": "operation finished <*>",
+                    "tokens": [
+                      "operation",
+                      "finished",
+                      "<*>"
+                    ],
+                    "static_count": 2
+                  }
+                ],
+                "children": {}
+              }
+            }
+          }
+        }
+      },
+      "attempt": {
+        "terminals": [],
+        "children": {
+          "started": {
+            "terminals": [],
+            "children": {
+              "<*>": {
+                "terminals": [
+                  {
+                    "call_node_id": "30064771241",
+                    "raw_template": "attempt started <*>",
+                    "tokens": [
+                      "attempt",
+                      "started",
+                      "<*>"
+                    ],
+                    "static_count": 2
+                  }
+                ],
+                "children": {}
+              }
+            }
+          }
+        }
+      },
+      "temporary": {
+        "terminals": [],
+        "children": {
+          "failure": {
+            "terminals": [],
+            "children": {
+              "retrying": {
+                "terminals": [],
+                "children": {
+                  "<*>": {
+                    "terminals": [
+                      {
+                        "call_node_id": "30064771246",
+                        "raw_template": "temporary failure retrying <*>",
+                        "tokens": [
+                          "temporary",
+                          "failure",
+                          "retrying",
+                          "<*>"
+                        ],
+                        "static_count": 3
+                      }
+                    ],
+                    "children": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "retry": {
+        "terminals": [],
+        "children": {
+          "budget": {
+            "terminals": [],
+            "children": {
+              "exhausted": {
+                "terminals": [],
+                "children": {
+                  "<*>": {
+                    "terminals": [
+                      {
+                        "call_node_id": "30064771248",
+                        "raw_template": "retry budget exhausted <*>",
+                        "tokens": [
+                          "retry",
+                          "budget",
+                          "exhausted",
+                          "<*>"
+                        ],
+                        "static_count": 3
+                      }
+                    ],
+                    "children": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

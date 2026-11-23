@@ -1,0 +1,7 @@
+{
+  "build_time_s": 1.2718006999930367,
+  "train_traces": 40,
+  "k": 2,
+  "u": 1,
+  "mint_timeout_s": 300
+}
