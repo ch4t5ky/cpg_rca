@@ -1,0 +1,560 @@
+{
+  "entrypoint_node_id": "107374182417",
+  "entrypoint_name": "execute",
+  "entrypoint_full_name": ":<module>.RetryService.execute",
+  "summary": "entrypoint=:<module>.RetryService.execute, segments=13, transitions=26, starts=1, terminals=1, warnings=1",
+  "warnings": [
+    "entrypoint: ':<module>.RetryService.execute<metaClassAdapter>' is a synthetic <metaClassAdapter> wrapper; entrypoint resolved to implementation ':<module>.RetryService.execute' via its internal call site."
+  ],
+  "diagnostics": {
+    "entrypoint_full_name": ":<module>.RetryService.execute",
+    "catalog_templates": 8,
+    "analyzed_methods": [
+      ":<module>.RetryService.dependency_call",
+      ":<module>.RetryService.execute"
+    ],
+    "matched_call_ids": [
+      "30064771236",
+      "30064771241",
+      "30064771246",
+      "30064771248",
+      "30064771251",
+      "30064771263"
+    ],
+    "reachable_log_boundaries": [
+      "30064771236",
+      "30064771241",
+      "30064771246",
+      "30064771248",
+      "30064771251",
+      "30064771263"
+    ]
+  },
+  "start_states": [
+    "segment:0"
+  ],
+  "terminal_states": [
+    "segment:12"
+  ],
+  "states": [
+    {
+      "id": "segment:0",
+      "entrypoint_full_name": ":<module>.RetryService.execute",
+      "method_full_name": ":<module>.RetryService.execute",
+      "direct_methods": [],
+      "external_calls": [],
+      "conditions": [],
+      "previous_log_call_node_id": null,
+      "next_log_call_node_id": "30064771236",
+      "is_start": true,
+      "is_terminal": false,
+      "kind": "START_SEGMENT"
+    },
+    {
+      "id": "segment:1",
+      "entrypoint_full_name": ":<module>.RetryService.execute",
+      "method_full_name": ":<module>.RetryService.execute",
+      "direct_methods": [],
+      "external_calls": [
+        "time.py:<module>.perf_counter",
+        "<unknownFullName>"
+      ],
+      "conditions": [
+        "next iteration",
+        "exit: not (while ... : ...)"
+      ],
+      "previous_log_call_node_id": "30064771236",
+      "next_log_call_node_id": "30064771263",
+      "is_start": false,
+      "is_terminal": false,
+      "kind": "START_SEGMENT"
+    },
+    {
+      "id": "segment:2",
+      "entrypoint_full_name": ":<module>.RetryService.execute",
+      "method_full_name": ":<module>.RetryService.execute",
+      "direct_methods": [],
+      "external_calls": [
+        "time.py:<module>.perf_counter",
+        "<unknownFullName>"
+      ],
+      "conditions": [
+        "next iteration",
+        "body"
+      ],
+      "previous_log_call_node_id": "30064771236",
+      "next_log_call_node_id": "30064771241",
+      "is_start": false,
+      "is_terminal": false,
+      "kind": "START_SEGMENT"
+    },
+    {
+      "id": "segment:3",
+      "entrypoint_full_name": ":<module>.RetryService.execute",
+      "method_full_name": ":<module>.RetryService.execute",
+      "direct_methods": [
+        ":<module>.RetryService.dependency_call"
+      ],
+      "external_calls": [
+        ":<module>.TemporaryFailure.__init__"
+      ],
+      "conditions": [
+        "FALSE",
+        "TRUE"
+      ],
+      "previous_log_call_node_id": "30064771241",
+      "next_log_call_node_id": "30064771251",
+      "is_start": false,
+      "is_terminal": false,
+      "kind": "START_SEGMENT"
+    },
+    {
+      "id": "segment:4",
+      "entrypoint_full_name": ":<module>.RetryService.execute",
+      "method_full_name": ":<module>.RetryService.execute",
+      "direct_methods": [
+        ":<module>.RetryService.dependency_call"
+      ],
+      "external_calls": [
+        ":<module>.TemporaryFailure.__init__"
+      ],
+      "conditions": [
+        "FALSE",
+        "TRUE"
+      ],
+      "previous_log_call_node_id": "30064771241",
+      "next_log_call_node_id": "30064771248",
+      "is_start": false,
+      "is_terminal": false,
+      "kind": "START_SEGMENT"
+    },
+    {
+      "id": "segment:5",
+      "entrypoint_full_name": ":<module>.RetryService.execute",
+      "method_full_name": ":<module>.RetryService.execute",
+      "direct_methods": [
+        ":<module>.RetryService.dependency_call"
+      ],
+      "external_calls": [
+        ":<module>.TemporaryFailure.__init__"
+      ],
+      "conditions": [
+        "FALSE",
+        "TRUE"
+      ],
+      "previous_log_call_node_id": "30064771241",
+      "next_log_call_node_id": "30064771246",
+      "is_start": false,
+      "is_terminal": false,
+      "kind": "START_SEGMENT"
+    },
+    {
+      "id": "segment:6",
+      "entrypoint_full_name": ":<module>.RetryService.execute",
+      "method_full_name": ":<module>.RetryService.execute",
+      "direct_methods": [
+        ":<module>.RetryService.dependency_call"
+      ],
+      "external_calls": [
+        ":<module>.TemporaryFailure.__init__"
+      ],
+      "conditions": [
+        "FALSE",
+        "TRUE",
+        "next iteration",
+        "exit: not (while ... : ...)"
+      ],
+      "previous_log_call_node_id": "30064771241",
+      "next_log_call_node_id": "30064771263",
+      "is_start": false,
+      "is_terminal": false,
+      "kind": "START_SEGMENT"
+    },
+    {
+      "id": "segment:7",
+      "entrypoint_full_name": ":<module>.RetryService.execute",
+      "method_full_name": ":<module>.RetryService.execute",
+      "direct_methods": [
+        ":<module>.RetryService.dependency_call"
+      ],
+      "external_calls": [
+        ":<module>.TemporaryFailure.__init__",
+        "<unknownFullName>"
+      ],
+      "conditions": [
+        "FALSE",
+        "TRUE",
+        "next iteration",
+        "body"
+      ],
+      "previous_log_call_node_id": "30064771241",
+      "next_log_call_node_id": "30064771241",
+      "is_start": false,
+      "is_terminal": false,
+      "kind": "START_SEGMENT"
+    },
+    {
+      "id": "segment:8",
+      "entrypoint_full_name": ":<module>.RetryService.execute",
+      "method_full_name": ":<module>.RetryService.execute",
+      "direct_methods": [],
+      "external_calls": [],
+      "conditions": [
+        "next iteration",
+        "exit: not (while ... : ...)"
+      ],
+      "previous_log_call_node_id": "30064771246",
+      "next_log_call_node_id": "30064771263",
+      "is_start": false,
+      "is_terminal": false,
+      "kind": "START_SEGMENT"
+    },
+    {
+      "id": "segment:9",
+      "entrypoint_full_name": ":<module>.RetryService.execute",
+      "method_full_name": ":<module>.RetryService.execute",
+      "direct_methods": [],
+      "external_calls": [
+        "<unknownFullName>"
+      ],
+      "conditions": [
+        "next iteration",
+        "body"
+      ],
+      "previous_log_call_node_id": "30064771246",
+      "next_log_call_node_id": "30064771241",
+      "is_start": false,
+      "is_terminal": false,
+      "kind": "START_SEGMENT"
+    },
+    {
+      "id": "segment:10",
+      "entrypoint_full_name": ":<module>.RetryService.execute",
+      "method_full_name": ":<module>.RetryService.execute",
+      "direct_methods": [],
+      "external_calls": [],
+      "conditions": [],
+      "previous_log_call_node_id": "30064771248",
+      "next_log_call_node_id": "30064771263",
+      "is_start": false,
+      "is_terminal": false,
+      "kind": "START_SEGMENT"
+    },
+    {
+      "id": "segment:11",
+      "entrypoint_full_name": ":<module>.RetryService.execute",
+      "method_full_name": ":<module>.RetryService.execute",
+      "direct_methods": [],
+      "external_calls": [],
+      "conditions": [],
+      "previous_log_call_node_id": "30064771251",
+      "next_log_call_node_id": "30064771263",
+      "is_start": false,
+      "is_terminal": false,
+      "kind": "START_SEGMENT"
+    },
+    {
+      "id": "segment:12",
+      "entrypoint_full_name": ":<module>.RetryService.execute",
+      "method_full_name": ":<module>.RetryService.execute",
+      "direct_methods": [],
+      "external_calls": [
+        "time.py:<module>.perf_counter"
+      ],
+      "conditions": [],
+      "previous_log_call_node_id": "30064771263",
+      "next_log_call_node_id": null,
+      "is_start": false,
+      "is_terminal": true,
+      "kind": "RETURN_SEGMENT"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "log_transition:0",
+      "source_segment_id": "segment:0",
+      "target_segment_id": "segment:1",
+      "template": "operation started <*>",
+      "log_call_node_id": "30064771236",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:1",
+      "source_segment_id": "segment:0",
+      "target_segment_id": "segment:2",
+      "template": "operation started <*>",
+      "log_call_node_id": "30064771236",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:2",
+      "source_segment_id": "segment:2",
+      "target_segment_id": "segment:3",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:3",
+      "source_segment_id": "segment:2",
+      "target_segment_id": "segment:4",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:4",
+      "source_segment_id": "segment:2",
+      "target_segment_id": "segment:5",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:5",
+      "source_segment_id": "segment:2",
+      "target_segment_id": "segment:6",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:6",
+      "source_segment_id": "segment:2",
+      "target_segment_id": "segment:7",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:7",
+      "source_segment_id": "segment:7",
+      "target_segment_id": "segment:3",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:8",
+      "source_segment_id": "segment:7",
+      "target_segment_id": "segment:4",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:9",
+      "source_segment_id": "segment:7",
+      "target_segment_id": "segment:5",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:10",
+      "source_segment_id": "segment:7",
+      "target_segment_id": "segment:6",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:11",
+      "source_segment_id": "segment:7",
+      "target_segment_id": "segment:7",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:12",
+      "source_segment_id": "segment:9",
+      "target_segment_id": "segment:3",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:13",
+      "source_segment_id": "segment:9",
+      "target_segment_id": "segment:4",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:14",
+      "source_segment_id": "segment:9",
+      "target_segment_id": "segment:5",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:15",
+      "source_segment_id": "segment:9",
+      "target_segment_id": "segment:6",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:16",
+      "source_segment_id": "segment:9",
+      "target_segment_id": "segment:7",
+      "template": "attempt started <*>",
+      "log_call_node_id": "30064771241",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:17",
+      "source_segment_id": "segment:5",
+      "target_segment_id": "segment:8",
+      "template": "temporary failure retrying <*>",
+      "log_call_node_id": "30064771246",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 3
+    },
+    {
+      "id": "log_transition:18",
+      "source_segment_id": "segment:5",
+      "target_segment_id": "segment:9",
+      "template": "temporary failure retrying <*>",
+      "log_call_node_id": "30064771246",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 3
+    },
+    {
+      "id": "log_transition:19",
+      "source_segment_id": "segment:4",
+      "target_segment_id": "segment:10",
+      "template": "retry budget exhausted <*>",
+      "log_call_node_id": "30064771248",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 3
+    },
+    {
+      "id": "log_transition:20",
+      "source_segment_id": "segment:3",
+      "target_segment_id": "segment:11",
+      "template": "operation succeeded <*>",
+      "log_call_node_id": "30064771251",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:21",
+      "source_segment_id": "segment:1",
+      "target_segment_id": "segment:12",
+      "template": "operation finished <*>",
+      "log_call_node_id": "30064771263",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:22",
+      "source_segment_id": "segment:6",
+      "target_segment_id": "segment:12",
+      "template": "operation finished <*>",
+      "log_call_node_id": "30064771263",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:23",
+      "source_segment_id": "segment:8",
+      "target_segment_id": "segment:12",
+      "template": "operation finished <*>",
+      "log_call_node_id": "30064771263",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:24",
+      "source_segment_id": "segment:10",
+      "target_segment_id": "segment:12",
+      "template": "operation finished <*>",
+      "log_call_node_id": "30064771263",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    },
+    {
+      "id": "log_transition:25",
+      "source_segment_id": "segment:11",
+      "target_segment_id": "segment:12",
+      "template": "operation finished <*>",
+      "log_call_node_id": "30064771263",
+      "method_full_name": ":<module>.RetryService.execute",
+      "method_node_id": "107374182417",
+      "conditions": [],
+      "static_score": 2
+    }
+  ]
+}

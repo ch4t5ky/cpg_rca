@@ -167,6 +167,7 @@ class EntrypointFlowResult:
     cycle_warnings: List[str] = field(default_factory=list)
     max_depth_reached: bool = False
     semantic_graphs: Dict[str, SemanticFlowGraph] = field(default_factory=dict)
+    entrypoint_resolution: List[str] = field(default_factory=list)
 
     @property
     def total_invocations(self) -> int:
@@ -193,6 +194,8 @@ class EntrypointFlowResult:
             )
         if self.max_depth_reached:
             lines.append("max_depth reached — callees were not expanded further")
+        for note in self.entrypoint_resolution:
+            lines.append(f"entrypoint resolution : {note}")
         return "\n".join(lines)
 
 
@@ -243,9 +246,81 @@ class EntrypointFlow:
             entrypoint_name=_node_attr(self._G, entrypoint_node_id, "NAME"),
             entrypoint_full_name=full_name,
         )
+        resolved_id, resolved_name, note = self._resolve_meta_class_adapter(
+            entrypoint_node_id
+        )
+        if note:
+            result.entrypoint_resolution.append(note)
+        if resolved_id is not None:
+            # A verifiable adapter → implementation link was found: analyse
+            # the implementation, not the synthetic adapter body.
+            entrypoint_node_id = resolved_id
+            full_name = resolved_name
+            result.entrypoint_node_id = resolved_id
+            result.entrypoint_name = _node_attr(self._G, resolved_id, "NAME")
+            result.entrypoint_full_name = full_name
         if full_name:
             self._expand_method(full_name, 0, [0], set(), set(), result, "", None)
         return result
+
+    # ── synthetic <metaClassAdapter> resolution ─────────────────────────
+
+    _ADAPTER_SUFFIX = "<metaClassAdapter>"
+
+    def _resolve_meta_class_adapter(
+        self, method_node_id: str
+    ) -> Tuple[Optional[str], Optional[str], str]:
+        """Resolve a synthetic ``<metaClassAdapter>`` method to its implementation.
+
+        Joern's Python frontend emits a synthetic wrapper method named
+        ``<name><metaClassAdapter>`` for metaclass-dispatched calls. The link
+        to the real implementation is *not* recoverable from the name alone;
+        it is confirmed only through an internal CALL inside the adapter whose
+        ``METHOD_FULL_NAME`` resolves to a defined method named exactly
+        ``<name>``. With exactly one such callee the adapter is transparently
+        replaced by the implementation; otherwise the adapter is analysed as
+        is and an explicit diagnostic is returned.
+
+        Returns (resolved_node_id, resolved_full_name, diagnostic).
+        ``resolved_node_id is None`` means "keep the adapter"; the diagnostic
+        is empty when the node is not an adapter at all.
+        """
+        name = _node_attr(self._G, method_node_id, "NAME")
+        full_name = _node_attr(self._G, method_node_id, "FULLNAME", "FULL_NAME")
+        marker = self._ADAPTER_SUFFIX
+        if marker not in name:
+            return None, None, ""
+
+        base_name = name.split(marker, 1)[0]
+        candidates: Set[str] = set()
+        if base_name:
+            method = self._mc.build(method_node_id)
+            for call in method.call_sites:
+                callee = call.method_full_name
+                if callee not in self._fn_index:
+                    continue
+                if _node_attr(self._G, self._fn_index[callee], "NAME") == base_name:
+                    candidates.add(callee)
+
+        if len(candidates) == 1:
+            callee = next(iter(candidates))
+            return (
+                self._fn_index[callee],
+                callee,
+                f"'{full_name}' is a synthetic {marker} wrapper; entrypoint "
+                f"resolved to implementation '{callee}' via its internal call site.",
+            )
+        if not candidates:
+            reason = f"no internal call to a method named '{base_name}'"
+        else:
+            reason = f"ambiguous internal callees: {sorted(candidates)}"
+        return (
+            None,
+            None,
+            f"'{full_name}' is a synthetic {marker} wrapper, but its link to an "
+            f"implementation could not be verified ({reason}); the adapter body "
+            f"itself was analysed, which usually contains no business logic.",
+        )
 
     def build_by_name(self, name: str) -> Optional[EntrypointFlowResult]:
         candidates = self._name_index.get(name, [])

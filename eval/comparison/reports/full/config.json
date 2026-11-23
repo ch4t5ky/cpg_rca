@@ -1,0 +1,77 @@
+{
+  "started_utc": "2026-11-23T07:36:26.506039+00:00",
+  "variant": "full",
+  "python": "3.13.11 (tags/v3.13.11:6278944, Dec  5 2025, 16:26:58) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "java": "java version \"1.8.0_401\"",
+  "fixture": "D:\\ИТМО\\аспирантура\\cpg_rca\\eval\\comparison\\data\\fixture_data",
+  "service_cpg": "D:\\ИТМО\\аспирантура\\cpg_rca\\services\\retryservice\\export.dot",
+  "split": {
+    "train": [
+      "immediate_success",
+      "one_retry_success"
+    ],
+    "test": [
+      "retry_exhausted",
+      "two_retries_success"
+    ],
+    "group_rule": "known = scenarios present in train; heldout = test-only scenarios",
+    "generator": "services/retryservice/retry_service.py --repetitions 20 (deterministic)"
+  },
+  "seeds": {
+    "prins_max_traces_sample": 42,
+    "comment": "no random sampling in this run"
+  },
+  "alphabet": "normalize_message (numbers/hex/uuids -> <*>) for every method",
+  "acceptance": "full acceptance: initial state, every event consumed, terminal state; no skipping",
+  "invalid_traces": {
+    "source": "eval/comparison/invalid_traces.json",
+    "labelling": "independent: derived from retry_service.py source semantics, not from any evaluated FSM",
+    "n": 6
+  },
+  "methods": {
+    "cpg_rca": {
+      "type": "code-based (CPG -> semantic flow -> FSM)",
+      "flow_max_depth": 5,
+      "flow_max_paths": 50,
+      "entrypoint": "RetryService.execute (resolved by name; Joern ids are not stable)",
+      "event_cleaning": "events normalized with src/online/trie_matcher.normalize_text (the online-stage runtime policy; offline artifacts unchanged)",
+      "build_time_s": 9.215,
+      "event_coverage": 1.0,
+      "log_to_code": {
+        "events_with_oracle": 520,
+        "matched_to_call_site": 520,
+        "line_correct": 520,
+        "accuracy": 1.0,
+        "note": "oracle line compared with CPG CALL node LINE_NUMBER of every template-matched call id"
+      }
+    },
+    "PRINS": {
+      "type": "log-based (train traces -> MINT -> hybrid determinization)",
+      "k": 2,
+      "u": 1,
+      "mint_timeout_s": 300,
+      "ignore_values": true,
+      "train_traces": 40,
+      "alphabet_encoding": "canonical messages mapped to whitespace-free ids E0000.. (MINT input format)",
+      "build_time_s": "cached",
+      "event_coverage": 0.833333,
+      "states": 5,
+      "transitions": 5,
+      "log_to_code": "N/A (no code-level output)"
+    },
+    "LogSynthFSM": {
+      "type": "log-based (train traces -> regex parsing -> LLM State Discovery FSM)",
+      "scope": "FSM stage only (not the synthesis / anomaly-detection pipeline)",
+      "parse_mode": "regex",
+      "train_traces": 40,
+      "artifacts_dir": "D:\\ИТМО\\аспирантура\\cpg_rca\\eval\\comparison\\reports\\full\\LogSynthFSM",
+      "provider": "ollama",
+      "build_time_s": 83.709,
+      "event_coverage": 0.833333,
+      "states": 5,
+      "transitions": 5,
+      "log_to_code": "N/A (no code-level output)"
+    }
+  }
+}

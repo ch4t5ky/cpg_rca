@@ -1,0 +1,6 @@
+state_id,state_name,state_desc
+TMP_17CC4A035C,Operation Started,The operation has started.
+TMP_463A4636DC,Attempt Started,The attempt has started.
+TMP_0E2FBEF305,Temporary Failure,A temporary failure has occurred.
+TMP_A8DA3AF8B0,Operation Succeeded,The operation has succeeded.
+TMP_46D5FCFDC2,Operation Finished,The operation has finished.

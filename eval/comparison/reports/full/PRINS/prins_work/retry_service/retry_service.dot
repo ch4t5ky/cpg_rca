@@ -1,0 +1,14 @@
+digraph Automaton {
+0 [root=true,label="0",shape=doublecircle];
+  0 -> 1 [label="E0000"]
+  1 [label="1",shape=circle];
+  1 -> 2 [label="E0001"]
+  2 [label="2",shape=circle];
+  2 -> 1 [label="E0004"]
+  2 -> 3 [label="E0002"]
+  3 [label="3",shape=circle];
+  3 -> 4 [label="E0003"]
+  4 [label="4",shape=circle];
+  4 -> 5 [label="__END__"]
+  5 [label="5",shape=doublecircle];
+}

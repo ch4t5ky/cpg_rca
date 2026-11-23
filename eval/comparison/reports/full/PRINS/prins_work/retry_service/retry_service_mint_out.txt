@@ -1,0 +1,38 @@
+digraph Automaton {
+  0 [label="0",shape=doublecircle];
+  initial [shape=plaintext];
+  initial -> 0
+  0 -> 1 [label="E0000"]
+  1 [label="1",shape=circle];
+  1 -> 2 [label="E0001"]
+  2 [label="2",shape=circle];
+  2 -> 1 [label="E0004"]
+  2 -> 3 [label="E0002"]
+  3 [label="3",shape=circle];
+  3 -> 4 [label="E0003"]
+  4 [label="4",shape=circle];
+  4 -> 5 [label="__END__"]
+  5 [label="5",shape=doublecircle];
+}
+
+
+=========================== MODEL FOR:E0001 =========================== 
+AdaBoostM1
+==========
+
+Warning: No model could be built, hence ZeroR model is used:
+
+ZeroR predicts class value: E0002
+log4j:ERROR Could not read configuration file [log4j.properties].
+java.io.FileNotFoundException: log4j.properties (Не удается найти указанный файл)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at org.apache.log4j.PropertyConfigurator.doConfigure(PropertyConfigurator.java:372)
+	at org.apache.log4j.PropertyConfigurator.configure(PropertyConfigurator.java:403)
+	at mint.app.Mint.main(Mint.java:194)
+log4j:ERROR Ignoring configuration file [log4j.properties].
+log4j:WARN No appenders could be found for logger (mint.app.Mint).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.

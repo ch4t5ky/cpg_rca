@@ -1,0 +1,520 @@
+{"timestamp": "2026-11-22T20:27:18.113712+00:00", "service": "retry_service", "execution_id": "immediate_success-0000", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.113814+00:00", "service": "retry_service", "execution_id": "immediate_success-0000", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.113843+00:00", "service": "retry_service", "execution_id": "immediate_success-0000", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.113867+00:00", "service": "retry_service", "execution_id": "immediate_success-0000", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.113890+00:00", "service": "retry_service", "execution_id": "immediate_success-0001", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.113905+00:00", "service": "retry_service", "execution_id": "immediate_success-0001", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.113919+00:00", "service": "retry_service", "execution_id": "immediate_success-0001", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.113931+00:00", "service": "retry_service", "execution_id": "immediate_success-0001", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.113948+00:00", "service": "retry_service", "execution_id": "immediate_success-0002", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.113961+00:00", "service": "retry_service", "execution_id": "immediate_success-0002", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.113972+00:00", "service": "retry_service", "execution_id": "immediate_success-0002", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.113986+00:00", "service": "retry_service", "execution_id": "immediate_success-0002", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.114003+00:00", "service": "retry_service", "execution_id": "immediate_success-0003", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.114016+00:00", "service": "retry_service", "execution_id": "immediate_success-0003", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.114027+00:00", "service": "retry_service", "execution_id": "immediate_success-0003", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.114038+00:00", "service": "retry_service", "execution_id": "immediate_success-0003", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.114052+00:00", "service": "retry_service", "execution_id": "immediate_success-0004", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.114063+00:00", "service": "retry_service", "execution_id": "immediate_success-0004", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.114074+00:00", "service": "retry_service", "execution_id": "immediate_success-0004", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.114086+00:00", "service": "retry_service", "execution_id": "immediate_success-0004", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.114100+00:00", "service": "retry_service", "execution_id": "immediate_success-0005", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.114111+00:00", "service": "retry_service", "execution_id": "immediate_success-0005", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.114122+00:00", "service": "retry_service", "execution_id": "immediate_success-0005", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.114133+00:00", "service": "retry_service", "execution_id": "immediate_success-0005", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.114148+00:00", "service": "retry_service", "execution_id": "immediate_success-0006", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.114160+00:00", "service": "retry_service", "execution_id": "immediate_success-0006", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.114173+00:00", "service": "retry_service", "execution_id": "immediate_success-0006", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.114186+00:00", "service": "retry_service", "execution_id": "immediate_success-0006", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.114203+00:00", "service": "retry_service", "execution_id": "immediate_success-0007", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.114215+00:00", "service": "retry_service", "execution_id": "immediate_success-0007", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.114227+00:00", "service": "retry_service", "execution_id": "immediate_success-0007", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.114239+00:00", "service": "retry_service", "execution_id": "immediate_success-0007", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.114252+00:00", "service": "retry_service", "execution_id": "immediate_success-0008", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.114264+00:00", "service": "retry_service", "execution_id": "immediate_success-0008", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.114275+00:00", "service": "retry_service", "execution_id": "immediate_success-0008", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.114287+00:00", "service": "retry_service", "execution_id": "immediate_success-0008", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.114300+00:00", "service": "retry_service", "execution_id": "immediate_success-0009", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.114311+00:00", "service": "retry_service", "execution_id": "immediate_success-0009", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.114326+00:00", "service": "retry_service", "execution_id": "immediate_success-0009", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.114337+00:00", "service": "retry_service", "execution_id": "immediate_success-0009", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.114350+00:00", "service": "retry_service", "execution_id": "immediate_success-0010", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.114588+00:00", "service": "retry_service", "execution_id": "immediate_success-0010", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.114642+00:00", "service": "retry_service", "execution_id": "immediate_success-0010", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.114661+00:00", "service": "retry_service", "execution_id": "immediate_success-0010", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.114848+00:00", "service": "retry_service", "execution_id": "immediate_success-0011", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.114874+00:00", "service": "retry_service", "execution_id": "immediate_success-0011", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.114889+00:00", "service": "retry_service", "execution_id": "immediate_success-0011", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.114901+00:00", "service": "retry_service", "execution_id": "immediate_success-0011", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.114953+00:00", "service": "retry_service", "execution_id": "immediate_success-0012", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.114970+00:00", "service": "retry_service", "execution_id": "immediate_success-0012", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.114984+00:00", "service": "retry_service", "execution_id": "immediate_success-0012", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.114997+00:00", "service": "retry_service", "execution_id": "immediate_success-0012", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.115012+00:00", "service": "retry_service", "execution_id": "immediate_success-0013", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.115024+00:00", "service": "retry_service", "execution_id": "immediate_success-0013", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115036+00:00", "service": "retry_service", "execution_id": "immediate_success-0013", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.115048+00:00", "service": "retry_service", "execution_id": "immediate_success-0013", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.115062+00:00", "service": "retry_service", "execution_id": "immediate_success-0014", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.115075+00:00", "service": "retry_service", "execution_id": "immediate_success-0014", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115089+00:00", "service": "retry_service", "execution_id": "immediate_success-0014", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.115101+00:00", "service": "retry_service", "execution_id": "immediate_success-0014", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.115115+00:00", "service": "retry_service", "execution_id": "immediate_success-0015", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.115127+00:00", "service": "retry_service", "execution_id": "immediate_success-0015", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115138+00:00", "service": "retry_service", "execution_id": "immediate_success-0015", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.115149+00:00", "service": "retry_service", "execution_id": "immediate_success-0015", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.115162+00:00", "service": "retry_service", "execution_id": "immediate_success-0016", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.115173+00:00", "service": "retry_service", "execution_id": "immediate_success-0016", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115184+00:00", "service": "retry_service", "execution_id": "immediate_success-0016", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.115196+00:00", "service": "retry_service", "execution_id": "immediate_success-0016", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.115214+00:00", "service": "retry_service", "execution_id": "immediate_success-0017", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.115226+00:00", "service": "retry_service", "execution_id": "immediate_success-0017", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115237+00:00", "service": "retry_service", "execution_id": "immediate_success-0017", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.115248+00:00", "service": "retry_service", "execution_id": "immediate_success-0017", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.115261+00:00", "service": "retry_service", "execution_id": "immediate_success-0018", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.115272+00:00", "service": "retry_service", "execution_id": "immediate_success-0018", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115283+00:00", "service": "retry_service", "execution_id": "immediate_success-0018", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.115294+00:00", "service": "retry_service", "execution_id": "immediate_success-0018", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.115306+00:00", "service": "retry_service", "execution_id": "immediate_success-0019", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.115317+00:00", "service": "retry_service", "execution_id": "immediate_success-0019", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115328+00:00", "service": "retry_service", "execution_id": "immediate_success-0019", "event_index": 3, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.115338+00:00", "service": "retry_service", "execution_id": "immediate_success-0019", "event_index": 4, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.115352+00:00", "service": "retry_service", "execution_id": "one_retry_success-0000", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.115364+00:00", "service": "retry_service", "execution_id": "one_retry_success-0000", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115487+00:00", "service": "retry_service", "execution_id": "one_retry_success-0000", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.115529+00:00", "service": "retry_service", "execution_id": "one_retry_success-0000", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115547+00:00", "service": "retry_service", "execution_id": "one_retry_success-0000", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.115561+00:00", "service": "retry_service", "execution_id": "one_retry_success-0000", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.115580+00:00", "service": "retry_service", "execution_id": "one_retry_success-0001", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.115594+00:00", "service": "retry_service", "execution_id": "one_retry_success-0001", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115709+00:00", "service": "retry_service", "execution_id": "one_retry_success-0001", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.115736+00:00", "service": "retry_service", "execution_id": "one_retry_success-0001", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115751+00:00", "service": "retry_service", "execution_id": "one_retry_success-0001", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.115764+00:00", "service": "retry_service", "execution_id": "one_retry_success-0001", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.115781+00:00", "service": "retry_service", "execution_id": "one_retry_success-0002", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.115793+00:00", "service": "retry_service", "execution_id": "one_retry_success-0002", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115805+00:00", "service": "retry_service", "execution_id": "one_retry_success-0002", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.115818+00:00", "service": "retry_service", "execution_id": "one_retry_success-0002", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115830+00:00", "service": "retry_service", "execution_id": "one_retry_success-0002", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.115841+00:00", "service": "retry_service", "execution_id": "one_retry_success-0002", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.115855+00:00", "service": "retry_service", "execution_id": "one_retry_success-0003", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.115867+00:00", "service": "retry_service", "execution_id": "one_retry_success-0003", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115879+00:00", "service": "retry_service", "execution_id": "one_retry_success-0003", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.115891+00:00", "service": "retry_service", "execution_id": "one_retry_success-0003", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115902+00:00", "service": "retry_service", "execution_id": "one_retry_success-0003", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.115913+00:00", "service": "retry_service", "execution_id": "one_retry_success-0003", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.115927+00:00", "service": "retry_service", "execution_id": "one_retry_success-0004", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.115939+00:00", "service": "retry_service", "execution_id": "one_retry_success-0004", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115951+00:00", "service": "retry_service", "execution_id": "one_retry_success-0004", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.115963+00:00", "service": "retry_service", "execution_id": "one_retry_success-0004", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.115974+00:00", "service": "retry_service", "execution_id": "one_retry_success-0004", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.115985+00:00", "service": "retry_service", "execution_id": "one_retry_success-0004", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.116000+00:00", "service": "retry_service", "execution_id": "one_retry_success-0005", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.116012+00:00", "service": "retry_service", "execution_id": "one_retry_success-0005", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.116024+00:00", "service": "retry_service", "execution_id": "one_retry_success-0005", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.116036+00:00", "service": "retry_service", "execution_id": "one_retry_success-0005", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.116047+00:00", "service": "retry_service", "execution_id": "one_retry_success-0005", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.116057+00:00", "service": "retry_service", "execution_id": "one_retry_success-0005", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.116071+00:00", "service": "retry_service", "execution_id": "one_retry_success-0006", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.116083+00:00", "service": "retry_service", "execution_id": "one_retry_success-0006", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.116094+00:00", "service": "retry_service", "execution_id": "one_retry_success-0006", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.116106+00:00", "service": "retry_service", "execution_id": "one_retry_success-0006", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.116118+00:00", "service": "retry_service", "execution_id": "one_retry_success-0006", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.116131+00:00", "service": "retry_service", "execution_id": "one_retry_success-0006", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.116148+00:00", "service": "retry_service", "execution_id": "one_retry_success-0007", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.116255+00:00", "service": "retry_service", "execution_id": "one_retry_success-0007", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.116283+00:00", "service": "retry_service", "execution_id": "one_retry_success-0007", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.116298+00:00", "service": "retry_service", "execution_id": "one_retry_success-0007", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.116312+00:00", "service": "retry_service", "execution_id": "one_retry_success-0007", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.116324+00:00", "service": "retry_service", "execution_id": "one_retry_success-0007", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.116341+00:00", "service": "retry_service", "execution_id": "one_retry_success-0008", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.116354+00:00", "service": "retry_service", "execution_id": "one_retry_success-0008", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.116366+00:00", "service": "retry_service", "execution_id": "one_retry_success-0008", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.116378+00:00", "service": "retry_service", "execution_id": "one_retry_success-0008", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.135681+00:00", "service": "retry_service", "execution_id": "one_retry_success-0008", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.135727+00:00", "service": "retry_service", "execution_id": "one_retry_success-0008", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.135753+00:00", "service": "retry_service", "execution_id": "one_retry_success-0009", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.135768+00:00", "service": "retry_service", "execution_id": "one_retry_success-0009", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.135782+00:00", "service": "retry_service", "execution_id": "one_retry_success-0009", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.135795+00:00", "service": "retry_service", "execution_id": "one_retry_success-0009", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.135807+00:00", "service": "retry_service", "execution_id": "one_retry_success-0009", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.135819+00:00", "service": "retry_service", "execution_id": "one_retry_success-0009", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.135834+00:00", "service": "retry_service", "execution_id": "one_retry_success-0010", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.135846+00:00", "service": "retry_service", "execution_id": "one_retry_success-0010", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.135857+00:00", "service": "retry_service", "execution_id": "one_retry_success-0010", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.135869+00:00", "service": "retry_service", "execution_id": "one_retry_success-0010", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.135880+00:00", "service": "retry_service", "execution_id": "one_retry_success-0010", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.135891+00:00", "service": "retry_service", "execution_id": "one_retry_success-0010", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.135905+00:00", "service": "retry_service", "execution_id": "one_retry_success-0011", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.135917+00:00", "service": "retry_service", "execution_id": "one_retry_success-0011", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.135929+00:00", "service": "retry_service", "execution_id": "one_retry_success-0011", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.135940+00:00", "service": "retry_service", "execution_id": "one_retry_success-0011", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.135951+00:00", "service": "retry_service", "execution_id": "one_retry_success-0011", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.135961+00:00", "service": "retry_service", "execution_id": "one_retry_success-0011", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.135975+00:00", "service": "retry_service", "execution_id": "one_retry_success-0012", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.135986+00:00", "service": "retry_service", "execution_id": "one_retry_success-0012", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.135998+00:00", "service": "retry_service", "execution_id": "one_retry_success-0012", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.136009+00:00", "service": "retry_service", "execution_id": "one_retry_success-0012", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.136020+00:00", "service": "retry_service", "execution_id": "one_retry_success-0012", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.136031+00:00", "service": "retry_service", "execution_id": "one_retry_success-0012", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.136045+00:00", "service": "retry_service", "execution_id": "one_retry_success-0013", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.136062+00:00", "service": "retry_service", "execution_id": "one_retry_success-0013", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.136074+00:00", "service": "retry_service", "execution_id": "one_retry_success-0013", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.136086+00:00", "service": "retry_service", "execution_id": "one_retry_success-0013", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.136097+00:00", "service": "retry_service", "execution_id": "one_retry_success-0013", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.136108+00:00", "service": "retry_service", "execution_id": "one_retry_success-0013", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.136256+00:00", "service": "retry_service", "execution_id": "one_retry_success-0014", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.136295+00:00", "service": "retry_service", "execution_id": "one_retry_success-0014", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.136314+00:00", "service": "retry_service", "execution_id": "one_retry_success-0014", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.136329+00:00", "service": "retry_service", "execution_id": "one_retry_success-0014", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.136342+00:00", "service": "retry_service", "execution_id": "one_retry_success-0014", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.136353+00:00", "service": "retry_service", "execution_id": "one_retry_success-0014", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.136370+00:00", "service": "retry_service", "execution_id": "one_retry_success-0015", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.136383+00:00", "service": "retry_service", "execution_id": "one_retry_success-0015", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.136395+00:00", "service": "retry_service", "execution_id": "one_retry_success-0015", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.136408+00:00", "service": "retry_service", "execution_id": "one_retry_success-0015", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.136419+00:00", "service": "retry_service", "execution_id": "one_retry_success-0015", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.136431+00:00", "service": "retry_service", "execution_id": "one_retry_success-0015", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.136554+00:00", "service": "retry_service", "execution_id": "one_retry_success-0016", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.136580+00:00", "service": "retry_service", "execution_id": "one_retry_success-0016", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.136595+00:00", "service": "retry_service", "execution_id": "one_retry_success-0016", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.136608+00:00", "service": "retry_service", "execution_id": "one_retry_success-0016", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.136620+00:00", "service": "retry_service", "execution_id": "one_retry_success-0016", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.136633+00:00", "service": "retry_service", "execution_id": "one_retry_success-0016", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.136648+00:00", "service": "retry_service", "execution_id": "one_retry_success-0017", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.136660+00:00", "service": "retry_service", "execution_id": "one_retry_success-0017", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.136672+00:00", "service": "retry_service", "execution_id": "one_retry_success-0017", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.136685+00:00", "service": "retry_service", "execution_id": "one_retry_success-0017", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.136697+00:00", "service": "retry_service", "execution_id": "one_retry_success-0017", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.136708+00:00", "service": "retry_service", "execution_id": "one_retry_success-0017", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.140074+00:00", "service": "retry_service", "execution_id": "one_retry_success-0018", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.140106+00:00", "service": "retry_service", "execution_id": "one_retry_success-0018", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140122+00:00", "service": "retry_service", "execution_id": "one_retry_success-0018", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.140137+00:00", "service": "retry_service", "execution_id": "one_retry_success-0018", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140151+00:00", "service": "retry_service", "execution_id": "one_retry_success-0018", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.140163+00:00", "service": "retry_service", "execution_id": "one_retry_success-0018", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.140179+00:00", "service": "retry_service", "execution_id": "one_retry_success-0019", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.140192+00:00", "service": "retry_service", "execution_id": "one_retry_success-0019", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140204+00:00", "service": "retry_service", "execution_id": "one_retry_success-0019", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.140216+00:00", "service": "retry_service", "execution_id": "one_retry_success-0019", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140227+00:00", "service": "retry_service", "execution_id": "one_retry_success-0019", "event_index": 5, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.140239+00:00", "service": "retry_service", "execution_id": "one_retry_success-0019", "event_index": 6, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.140254+00:00", "service": "retry_service", "execution_id": "two_retries_success-0000", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.140268+00:00", "service": "retry_service", "execution_id": "two_retries_success-0000", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140280+00:00", "service": "retry_service", "execution_id": "two_retries_success-0000", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.140292+00:00", "service": "retry_service", "execution_id": "two_retries_success-0000", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140303+00:00", "service": "retry_service", "execution_id": "two_retries_success-0000", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.140438+00:00", "service": "retry_service", "execution_id": "two_retries_success-0000", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140479+00:00", "service": "retry_service", "execution_id": "two_retries_success-0000", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.140496+00:00", "service": "retry_service", "execution_id": "two_retries_success-0000", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.140515+00:00", "service": "retry_service", "execution_id": "two_retries_success-0001", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.140529+00:00", "service": "retry_service", "execution_id": "two_retries_success-0001", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140542+00:00", "service": "retry_service", "execution_id": "two_retries_success-0001", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.140555+00:00", "service": "retry_service", "execution_id": "two_retries_success-0001", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140567+00:00", "service": "retry_service", "execution_id": "two_retries_success-0001", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.140579+00:00", "service": "retry_service", "execution_id": "two_retries_success-0001", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140590+00:00", "service": "retry_service", "execution_id": "two_retries_success-0001", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.140602+00:00", "service": "retry_service", "execution_id": "two_retries_success-0001", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.140616+00:00", "service": "retry_service", "execution_id": "two_retries_success-0002", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.140629+00:00", "service": "retry_service", "execution_id": "two_retries_success-0002", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140641+00:00", "service": "retry_service", "execution_id": "two_retries_success-0002", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.140653+00:00", "service": "retry_service", "execution_id": "two_retries_success-0002", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140758+00:00", "service": "retry_service", "execution_id": "two_retries_success-0002", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.140785+00:00", "service": "retry_service", "execution_id": "two_retries_success-0002", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140799+00:00", "service": "retry_service", "execution_id": "two_retries_success-0002", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.140812+00:00", "service": "retry_service", "execution_id": "two_retries_success-0002", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.140829+00:00", "service": "retry_service", "execution_id": "two_retries_success-0003", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.140841+00:00", "service": "retry_service", "execution_id": "two_retries_success-0003", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140854+00:00", "service": "retry_service", "execution_id": "two_retries_success-0003", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.140866+00:00", "service": "retry_service", "execution_id": "two_retries_success-0003", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140877+00:00", "service": "retry_service", "execution_id": "two_retries_success-0003", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.140889+00:00", "service": "retry_service", "execution_id": "two_retries_success-0003", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140901+00:00", "service": "retry_service", "execution_id": "two_retries_success-0003", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.140913+00:00", "service": "retry_service", "execution_id": "two_retries_success-0003", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.140928+00:00", "service": "retry_service", "execution_id": "two_retries_success-0004", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.140939+00:00", "service": "retry_service", "execution_id": "two_retries_success-0004", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140950+00:00", "service": "retry_service", "execution_id": "two_retries_success-0004", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.140962+00:00", "service": "retry_service", "execution_id": "two_retries_success-0004", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140975+00:00", "service": "retry_service", "execution_id": "two_retries_success-0004", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.140988+00:00", "service": "retry_service", "execution_id": "two_retries_success-0004", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.140999+00:00", "service": "retry_service", "execution_id": "two_retries_success-0004", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.141011+00:00", "service": "retry_service", "execution_id": "two_retries_success-0004", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.141024+00:00", "service": "retry_service", "execution_id": "two_retries_success-0005", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.141036+00:00", "service": "retry_service", "execution_id": "two_retries_success-0005", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.141048+00:00", "service": "retry_service", "execution_id": "two_retries_success-0005", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.141059+00:00", "service": "retry_service", "execution_id": "two_retries_success-0005", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.141070+00:00", "service": "retry_service", "execution_id": "two_retries_success-0005", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.142171+00:00", "service": "retry_service", "execution_id": "two_retries_success-0005", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142193+00:00", "service": "retry_service", "execution_id": "two_retries_success-0005", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.142209+00:00", "service": "retry_service", "execution_id": "two_retries_success-0005", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.142228+00:00", "service": "retry_service", "execution_id": "two_retries_success-0006", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.142241+00:00", "service": "retry_service", "execution_id": "two_retries_success-0006", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142254+00:00", "service": "retry_service", "execution_id": "two_retries_success-0006", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.142267+00:00", "service": "retry_service", "execution_id": "two_retries_success-0006", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142279+00:00", "service": "retry_service", "execution_id": "two_retries_success-0006", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.142292+00:00", "service": "retry_service", "execution_id": "two_retries_success-0006", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142303+00:00", "service": "retry_service", "execution_id": "two_retries_success-0006", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.142314+00:00", "service": "retry_service", "execution_id": "two_retries_success-0006", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.142329+00:00", "service": "retry_service", "execution_id": "two_retries_success-0007", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.142341+00:00", "service": "retry_service", "execution_id": "two_retries_success-0007", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142353+00:00", "service": "retry_service", "execution_id": "two_retries_success-0007", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.142364+00:00", "service": "retry_service", "execution_id": "two_retries_success-0007", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142375+00:00", "service": "retry_service", "execution_id": "two_retries_success-0007", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.142386+00:00", "service": "retry_service", "execution_id": "two_retries_success-0007", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142398+00:00", "service": "retry_service", "execution_id": "two_retries_success-0007", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.142514+00:00", "service": "retry_service", "execution_id": "two_retries_success-0007", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.142558+00:00", "service": "retry_service", "execution_id": "two_retries_success-0008", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.142577+00:00", "service": "retry_service", "execution_id": "two_retries_success-0008", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142592+00:00", "service": "retry_service", "execution_id": "two_retries_success-0008", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.142606+00:00", "service": "retry_service", "execution_id": "two_retries_success-0008", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142619+00:00", "service": "retry_service", "execution_id": "two_retries_success-0008", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.142631+00:00", "service": "retry_service", "execution_id": "two_retries_success-0008", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142642+00:00", "service": "retry_service", "execution_id": "two_retries_success-0008", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.142654+00:00", "service": "retry_service", "execution_id": "two_retries_success-0008", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.142670+00:00", "service": "retry_service", "execution_id": "two_retries_success-0009", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.142682+00:00", "service": "retry_service", "execution_id": "two_retries_success-0009", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142695+00:00", "service": "retry_service", "execution_id": "two_retries_success-0009", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.142707+00:00", "service": "retry_service", "execution_id": "two_retries_success-0009", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142719+00:00", "service": "retry_service", "execution_id": "two_retries_success-0009", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.142730+00:00", "service": "retry_service", "execution_id": "two_retries_success-0009", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142740+00:00", "service": "retry_service", "execution_id": "two_retries_success-0009", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.142751+00:00", "service": "retry_service", "execution_id": "two_retries_success-0009", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.142765+00:00", "service": "retry_service", "execution_id": "two_retries_success-0010", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.142777+00:00", "service": "retry_service", "execution_id": "two_retries_success-0010", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142789+00:00", "service": "retry_service", "execution_id": "two_retries_success-0010", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.142801+00:00", "service": "retry_service", "execution_id": "two_retries_success-0010", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142812+00:00", "service": "retry_service", "execution_id": "two_retries_success-0010", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.142928+00:00", "service": "retry_service", "execution_id": "two_retries_success-0010", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.142966+00:00", "service": "retry_service", "execution_id": "two_retries_success-0010", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.142985+00:00", "service": "retry_service", "execution_id": "two_retries_success-0010", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.143005+00:00", "service": "retry_service", "execution_id": "two_retries_success-0011", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.143019+00:00", "service": "retry_service", "execution_id": "two_retries_success-0011", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143033+00:00", "service": "retry_service", "execution_id": "two_retries_success-0011", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143046+00:00", "service": "retry_service", "execution_id": "two_retries_success-0011", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143059+00:00", "service": "retry_service", "execution_id": "two_retries_success-0011", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143070+00:00", "service": "retry_service", "execution_id": "two_retries_success-0011", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143081+00:00", "service": "retry_service", "execution_id": "two_retries_success-0011", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.143093+00:00", "service": "retry_service", "execution_id": "two_retries_success-0011", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.143109+00:00", "service": "retry_service", "execution_id": "two_retries_success-0012", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.143121+00:00", "service": "retry_service", "execution_id": "two_retries_success-0012", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143133+00:00", "service": "retry_service", "execution_id": "two_retries_success-0012", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143144+00:00", "service": "retry_service", "execution_id": "two_retries_success-0012", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143156+00:00", "service": "retry_service", "execution_id": "two_retries_success-0012", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143167+00:00", "service": "retry_service", "execution_id": "two_retries_success-0012", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143178+00:00", "service": "retry_service", "execution_id": "two_retries_success-0012", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.143190+00:00", "service": "retry_service", "execution_id": "two_retries_success-0012", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.143205+00:00", "service": "retry_service", "execution_id": "two_retries_success-0013", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.143216+00:00", "service": "retry_service", "execution_id": "two_retries_success-0013", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143317+00:00", "service": "retry_service", "execution_id": "two_retries_success-0013", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143342+00:00", "service": "retry_service", "execution_id": "two_retries_success-0013", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143358+00:00", "service": "retry_service", "execution_id": "two_retries_success-0013", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143370+00:00", "service": "retry_service", "execution_id": "two_retries_success-0013", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143383+00:00", "service": "retry_service", "execution_id": "two_retries_success-0013", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.143394+00:00", "service": "retry_service", "execution_id": "two_retries_success-0013", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.143409+00:00", "service": "retry_service", "execution_id": "two_retries_success-0014", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.143423+00:00", "service": "retry_service", "execution_id": "two_retries_success-0014", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143435+00:00", "service": "retry_service", "execution_id": "two_retries_success-0014", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143452+00:00", "service": "retry_service", "execution_id": "two_retries_success-0014", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143475+00:00", "service": "retry_service", "execution_id": "two_retries_success-0014", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143491+00:00", "service": "retry_service", "execution_id": "two_retries_success-0014", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143504+00:00", "service": "retry_service", "execution_id": "two_retries_success-0014", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.143517+00:00", "service": "retry_service", "execution_id": "two_retries_success-0014", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.143533+00:00", "service": "retry_service", "execution_id": "two_retries_success-0015", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.143546+00:00", "service": "retry_service", "execution_id": "two_retries_success-0015", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143559+00:00", "service": "retry_service", "execution_id": "two_retries_success-0015", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143571+00:00", "service": "retry_service", "execution_id": "two_retries_success-0015", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143582+00:00", "service": "retry_service", "execution_id": "two_retries_success-0015", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143677+00:00", "service": "retry_service", "execution_id": "two_retries_success-0015", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143703+00:00", "service": "retry_service", "execution_id": "two_retries_success-0015", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.143718+00:00", "service": "retry_service", "execution_id": "two_retries_success-0015", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.143736+00:00", "service": "retry_service", "execution_id": "two_retries_success-0016", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.143749+00:00", "service": "retry_service", "execution_id": "two_retries_success-0016", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143761+00:00", "service": "retry_service", "execution_id": "two_retries_success-0016", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143774+00:00", "service": "retry_service", "execution_id": "two_retries_success-0016", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143786+00:00", "service": "retry_service", "execution_id": "two_retries_success-0016", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143798+00:00", "service": "retry_service", "execution_id": "two_retries_success-0016", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143810+00:00", "service": "retry_service", "execution_id": "two_retries_success-0016", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.143821+00:00", "service": "retry_service", "execution_id": "two_retries_success-0016", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.143836+00:00", "service": "retry_service", "execution_id": "two_retries_success-0017", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.143849+00:00", "service": "retry_service", "execution_id": "two_retries_success-0017", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143862+00:00", "service": "retry_service", "execution_id": "two_retries_success-0017", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143874+00:00", "service": "retry_service", "execution_id": "two_retries_success-0017", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143887+00:00", "service": "retry_service", "execution_id": "two_retries_success-0017", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143898+00:00", "service": "retry_service", "execution_id": "two_retries_success-0017", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143909+00:00", "service": "retry_service", "execution_id": "two_retries_success-0017", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.143921+00:00", "service": "retry_service", "execution_id": "two_retries_success-0017", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.143935+00:00", "service": "retry_service", "execution_id": "two_retries_success-0018", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.143947+00:00", "service": "retry_service", "execution_id": "two_retries_success-0018", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143959+00:00", "service": "retry_service", "execution_id": "two_retries_success-0018", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.143970+00:00", "service": "retry_service", "execution_id": "two_retries_success-0018", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.143981+00:00", "service": "retry_service", "execution_id": "two_retries_success-0018", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.152619+00:00", "service": "retry_service", "execution_id": "two_retries_success-0018", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.152650+00:00", "service": "retry_service", "execution_id": "two_retries_success-0018", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.152665+00:00", "service": "retry_service", "execution_id": "two_retries_success-0018", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.152684+00:00", "service": "retry_service", "execution_id": "two_retries_success-0019", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.152698+00:00", "service": "retry_service", "execution_id": "two_retries_success-0019", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.152711+00:00", "service": "retry_service", "execution_id": "two_retries_success-0019", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.152729+00:00", "service": "retry_service", "execution_id": "two_retries_success-0019", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.152741+00:00", "service": "retry_service", "execution_id": "two_retries_success-0019", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.152752+00:00", "service": "retry_service", "execution_id": "two_retries_success-0019", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.152764+00:00", "service": "retry_service", "execution_id": "two_retries_success-0019", "event_index": 7, "level": "INFO", "message": "operation succeeded"}
+{"timestamp": "2026-11-22T20:27:18.152776+00:00", "service": "retry_service", "execution_id": "two_retries_success-0019", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.152792+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0000", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.152805+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0000", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.152818+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0000", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.152831+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0000", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.152842+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0000", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.152854+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0000", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.152996+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0000", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.153039+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0000", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.153066+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0001", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.153082+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0001", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153097+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0001", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.153111+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0001", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153124+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0001", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.153136+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0001", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153148+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0001", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.153160+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0001", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.153176+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0002", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.153189+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0002", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153201+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0002", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.153213+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0002", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153225+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0002", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.153236+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0002", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153248+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0002", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.153260+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0002", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.153275+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0003", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.153287+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0003", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153299+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0003", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.153311+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0003", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153323+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0003", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.153334+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0003", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153346+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0003", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.153357+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0003", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.153375+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0004", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.153487+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0004", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153512+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0004", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.153526+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0004", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153539+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0004", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.153552+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0004", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153563+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0004", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.153576+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0004", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.153593+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0005", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.153606+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0005", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153617+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0005", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.153629+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0005", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153641+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0005", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.153653+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0005", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153664+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0005", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.153882+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0005", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.153912+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0006", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.153927+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0006", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153941+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0006", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.153954+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0006", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153967+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0006", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.153979+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0006", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.153991+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0006", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.154002+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0006", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.154016+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0007", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.154028+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0007", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154040+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0007", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.154051+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0007", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154062+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0007", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.154073+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0007", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154084+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0007", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.154095+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0007", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.154110+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0008", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.154123+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0008", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154135+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0008", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.154146+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0008", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154158+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0008", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.154169+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0008", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154181+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0008", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.154193+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0008", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.154207+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0009", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.154219+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0009", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154231+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0009", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.154242+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0009", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154253+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0009", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.154356+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0009", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154385+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0009", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.154401+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0009", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.154420+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0010", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.154434+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0010", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154447+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0010", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.154488+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0010", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154506+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0010", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.154520+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0010", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154532+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0010", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.154544+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0010", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.154774+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0011", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.154801+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0011", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154816+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0011", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.154830+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0011", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154842+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0011", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.154854+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0011", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154866+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0011", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.154878+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0011", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.154894+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0012", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.154906+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0012", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154926+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0012", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.154940+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0012", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154952+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0012", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.154964+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0012", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.154976+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0012", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.154989+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0012", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.155004+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0013", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.155016+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0013", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155029+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0013", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.155041+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0013", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155052+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0013", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.155064+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0013", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155075+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0013", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.155087+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0013", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.155102+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0014", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.155114+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0014", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155127+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0014", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.155138+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0014", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155149+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0014", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.155160+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0014", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155172+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0014", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.155182+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0014", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.155196+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0015", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.155324+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0015", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155362+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0015", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.155380+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0015", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155395+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0015", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.155410+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0015", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155423+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0015", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.155436+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0015", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.155618+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0016", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.155752+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0016", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155780+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0016", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.155797+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0016", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155810+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0016", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.155824+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0016", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155837+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0016", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.155849+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0016", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.155867+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0017", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.155892+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0017", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155910+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0017", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.155924+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0017", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155937+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0017", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.155950+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0017", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.155962+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0017", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.155977+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0017", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.155994+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0018", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.156006+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0018", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.156018+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0018", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.156030+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0018", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.156043+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0018", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.156054+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0018", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.156066+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0018", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.156078+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0018", "event_index": 8, "level": "INFO", "message": "operation finished"}
+{"timestamp": "2026-11-22T20:27:18.156092+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0019", "event_index": 1, "level": "INFO", "message": "operation started"}
+{"timestamp": "2026-11-22T20:27:18.156105+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0019", "event_index": 2, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.156117+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0019", "event_index": 3, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.156129+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0019", "event_index": 4, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.156141+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0019", "event_index": 5, "level": "WARNING", "message": "temporary failure, retrying"}
+{"timestamp": "2026-11-22T20:27:18.156153+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0019", "event_index": 6, "level": "INFO", "message": "attempt started"}
+{"timestamp": "2026-11-22T20:27:18.156165+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0019", "event_index": 7, "level": "ERROR", "message": "retry budget exhausted"}
+{"timestamp": "2026-11-22T20:27:18.156176+00:00", "service": "retry_service", "execution_id": "retry_exhausted-0019", "event_index": 8, "level": "INFO", "message": "operation finished"}

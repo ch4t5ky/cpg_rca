@@ -70,6 +70,7 @@ class StaticLogFSM:
     states: Dict[str, ExecutionSegment] = field(default_factory=dict)
     transitions: List[LogTransition] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
+    diagnostics: Dict[str, object] = field(default_factory=dict)
 
     @property
     def edges(self) -> List[LogTransition]:
@@ -141,6 +142,13 @@ class _SegmentFacts:
             return True
         return False
 
+    def add_direct_method(self, full_name: str) -> bool:
+        full_name = (full_name or "").strip()
+        if full_name and full_name not in self.direct_methods:
+            self.direct_methods.append(full_name)
+            return True
+        return False
+
     def add_unit(self, unit: SemanticUnit, known_methods: Set[str]) -> bool:
         changed = False
         for callee in unit.callee_full_names:
@@ -192,16 +200,50 @@ class _Outcome:
     facts: _SegmentFacts = field(default_factory=_SegmentFacts)
 
 
-class LogFlowExtractor:
-    """Build a boundary-minimized FSM directly from SemanticFlowGraph."""
 
-    def __init__(self, templates: Iterable[LogTemplateWithMethod]) -> None:
+class LogFlowExtractor:
+    """Build a boundary-minimized FSM from the semantic graphs of a flow.
+
+    Interprocedural contract
+    ────────────────────────
+    Each SemanticFlowGraph is analysed in its own context. A logger CALL is a
+    global observable boundary identified by its physical CPG CALL node id, so
+    segments and transitions connect across method boundaries naturally.
+
+    * Downward calls use per-method summaries: ``_within(method, seeds)``
+      walks one graph, crossing into callees through their own summaries, and
+      reports callee-internal logger CALLs as outcomes plus an abstract RETURN
+      outcome when the callee can finish. Summaries are memoized per
+      (method, seed set); re-entry (recursion) is cut off and reported.
+    * A callee that finishes continues the caller *at the local call site
+      successors only* — never at another call site's continuation.
+    * When the walk of a non-root method reaches its return, the abstract
+      RETURN is resolved at every known call site of that method (union over
+      callers). This is a sound over-approximation: every emitted sequence is
+      physically possible, but segments that share the same observable
+      boundary (prev log, next log, kind) are merged per project semantics.
+    * Top-level (root) returns become RETURN_SEGMENT terminal states.
+    * Abstract returns that cannot be resolved (no call site in the flow,
+      recursion cut off, depth limit) become INCOMPLETE_SEGMENT terminals and
+      are reported in the diagnostics — the normal flow is never dropped.
+    """
+
+    _ABSTRACT_RETURN = "RETURN"  # internal kind: method may return to caller
+
+    def __init__(
+        self,
+        templates: Iterable[LogTemplateWithMethod],
+        max_call_depth: int = 8,
+    ) -> None:
         self.templates_by_call: Dict[str, LogTemplateWithMethod] = {}
         for template in templates:
             call_id = str(template.call_node_id)
             previous = self.templates_by_call.get(call_id)
             if previous is None or template.static_count > previous.static_count:
                 self.templates_by_call[call_id] = template
+        self.max_call_depth = max_call_depth
+
+    # ── public ──────────────────────────────────────────────────────────
 
     def extract(self, flow: EntrypointFlowResult) -> StaticLogFSM:
         fsm = StaticLogFSM(
@@ -209,21 +251,97 @@ class LogFlowExtractor:
             entrypoint_name=flow.entrypoint_name,
             entrypoint_full_name=flow.entrypoint_full_name,
         )
+        for note in getattr(flow, "entrypoint_resolution", []):
+            fsm.warnings.append(f"entrypoint: {note}")
+
+        diagnostics: Dict[str, object] = {
+            "entrypoint_full_name": flow.entrypoint_full_name,
+            "catalog_templates": len(self.templates_by_call),
+        }
+        fsm.diagnostics = diagnostics
+
         if not self.templates_by_call:
             fsm.warnings.append("Log template catalog is empty.")
             return fsm
 
-        graph = flow.semantic_graphs.get(flow.entrypoint_full_name)
+        graphs = flow.semantic_graphs
+        root_name = flow.entrypoint_full_name
+        graph = graphs.get(root_name)
         if graph is None:
-            fsm.warnings.append("Entrypoint has no semantic graph.")
+            fsm.warnings.append(
+                f"Entrypoint semantic graph is missing for '{root_name}'. "
+                f"Available methods: {sorted(graphs)}"
+            )
+            diagnostics["analyzed_methods"] = []
             return fsm
 
-        self._build_from_graph(
-            flow.entrypoint_full_name, graph, set(flow.semantic_graphs), fsm
+        matched_ids = {
+            str(call_id)
+            for g in graphs.values()
+            for unit in g.nodes.values()
+            for call_id in unit.call_node_ids
+            if str(call_id) in self.templates_by_call
+        }
+
+        explorer = _Explorer(self, flow, set(graphs))
+        outcomes_by_source = explorer.run(root_name)
+
+        diagnostics["analyzed_methods"] = sorted(explorer.touched_methods)
+        diagnostics["matched_call_ids"] = sorted(
+            matched_ids & explorer.all_call_ids_in_touched
         )
+        reachable = {
+            outcome.next_marker.call_node_id
+            for outcomes in outcomes_by_source.values()
+            for outcome in outcomes.values()
+            if outcome.next_marker is not None
+        }
+        diagnostics["reachable_log_boundaries"] = sorted(reachable)
+        if explorer.limited:
+            diagnostics["interprocedural_limits"] = list(explorer.limited)
+            fsm.warnings.append(
+                "Interprocedural expansion limited: " + "; ".join(explorer.limited)
+            )
+
+        self._assemble(fsm, flow.entrypoint_full_name, outcomes_by_source)
+
         if not fsm.transitions:
-            fsm.warnings.append("No logger CALL nodes matched the template catalog.")
+            fsm.warnings.append(
+                self._explain_empty(flow, matched_ids, explorer, reachable)
+            )
         return fsm
+
+    def _explain_empty(
+        self,
+        flow: EntrypointFlowResult,
+        matched_ids: Set[str],
+        explorer: "_Explorer",
+        reachable: Set[str],
+    ) -> str:
+        root_name = flow.entrypoint_full_name
+        if not matched_ids:
+            return (
+                f"No logger CALL IDs from the catalog "
+                f"({len(self.templates_by_call)} templates) match any semantic "
+                f"unit call_node_id in the {len(flow.semantic_graphs)} flow methods."
+            )
+        analyzed = matched_ids & explorer.all_call_ids_in_touched
+        if not analyzed:
+            return (
+                f"Catalog logger CALL IDs match only in methods that were not "
+                f"analyzed from entrypoint '{root_name}'. "
+                f"Matched elsewhere: {sorted(matched_ids)}. "
+                f"Analyzed methods: {sorted(explorer.touched_methods)}."
+            )
+        if not reachable:
+            return (
+                f"Matched logger CALL IDs {sorted(analyzed)} exist in the analyzed "
+                f"methods but are unreachable from START of '{root_name}'."
+            )
+        return (
+            f"Segments were built around reachable logger CALL IDs "
+            f"{sorted(reachable)} but no transitions were emitted."
+        )
 
     def _marker_for_unit(self, unit: Optional[SemanticUnit]) -> Optional[_LogMarker]:
         if unit is None:
@@ -243,34 +361,14 @@ class LogFlowExtractor:
             static_score=best.static_count,
         )
 
-    def _build_from_graph(
+    # ── FSM assembly (state = observable boundary) ──────────────────────
+
+    def _assemble(
         self,
-        entrypoint_full_name: str,
-        graph: SemanticFlowGraph,
-        known_methods: Set[str],
         fsm: StaticLogFSM,
+        entrypoint_full_name: str,
+        outcomes_by_source: Dict[Optional[str], Dict[Tuple[str, str], "_Outcome"]],
     ) -> None:
-        successors: Dict[str, List[Tuple[str, str]]] = defaultdict(list)
-        for edge in graph.edge_list:
-            successors[edge.source_id].append((edge.target_id, edge.condition))
-
-        # Each source is analysed once: method START or a physical logger CALL.
-        source_nodes: Dict[Optional[str], str] = {None: graph.start_node_id}
-        for node_id, unit in graph.nodes.items():
-            marker = self._marker_for_unit(unit)
-            if marker is not None:
-                source_nodes[marker.call_node_id] = node_id
-
-        outcomes_by_source: Dict[Optional[str], Dict[Tuple[str, str], _Outcome]] = {}
-        for source_log_id, source_node_id in source_nodes.items():
-            outcomes_by_source[source_log_id] = self._discover_outcomes(
-                graph=graph,
-                successors=successors,
-                source_node_id=source_node_id,
-                source_is_log=source_log_id is not None,
-                known_methods=known_methods,
-            )
-
         state_ids: Dict[Tuple[Optional[str], str, str], str] = {}
         state_counter = 0
 
@@ -376,15 +474,196 @@ class LogFlowExtractor:
                     )
                     transition_counter += 1
 
-    def _discover_outcomes(
+
+class _Explorer:
+    """Bounded interprocedural exploration of the flow semantic graphs."""
+
+    def __init__(
         self,
+        extractor: LogFlowExtractor,
+        flow: EntrypointFlowResult,
+        known_methods: Set[str],
+    ) -> None:
+        self._x = extractor
+        self._flow = flow
+        self._known = known_methods
+        self._graphs = flow.semantic_graphs
+        self._successors: Dict[str, Dict[str, List[Tuple[str, str]]]] = {}
+        self._within_memo: Dict[Tuple[str, str], Dict[Tuple[str, str], _Outcome]] = {}
+        self._within_progress: Set[Tuple[str, str]] = set()
+        self._resolve_memo: Dict[Tuple[str, str], Dict[Tuple[str, str], _Outcome]] = {}
+        self._resolve_progress: Set[Tuple[str, str]] = set()
+        self._return_sites: Optional[Dict[str, List[Tuple[str, str]]]] = None
+        self._resolve_method_stack: List[str] = []
+        self.limited: List[str] = []
+        self.touched_methods: Set[str] = set()
+        self.all_call_ids_in_touched: Set[str] = set()
+
+    # ── driver ──────────────────────────────────────────────────────────
+
+    def run(
+        self, root_name: str
+    ) -> Dict[Optional[str], Dict[Tuple[str, str], "_Outcome"]]:
+        root_graph = self._graphs[root_name]
+        outcomes_by_source: Dict[Optional[str], Dict[Tuple[str, str], _Outcome]] = {
+            None: self._resolve_source(
+                root_name,
+                "",
+                root_graph.start_node_id,
+                depth=0,
+                is_root=True,
+                source_is_log=False,
+            )
+        }
+        for method_name, graph in self._graphs.items():
+            for node_id, unit in graph.nodes.items():
+                marker = self._x._marker_for_unit(unit)
+                if marker is None:
+                    continue
+                outcomes_by_source[marker.call_node_id] = self._resolve_source(
+                    method_name,
+                    marker.call_node_id,
+                    node_id,
+                    depth=0,
+                    is_root=method_name == root_name,
+                    source_is_log=True,
+                )
+        return outcomes_by_source
+
+    def _resolve_source(
+        self,
+        method_name: str,
+        source_key: str,
+        source_node_id: str,
+        depth: int,
+        is_root: bool,
+        source_is_log: bool,
+    ) -> Dict[Tuple[str, str], "_Outcome"]:
+        """Outcomes for one boundary source; abstract returns are resolved."""
+        memo_key = (method_name, source_key)
+        if memo_key in self._resolve_memo:
+            return self._resolve_memo[memo_key]
+        if memo_key in self._resolve_progress:
+            self.limited.append(
+                f"cycle while resolving returns of '{method_name}' "
+                f"(source '{source_key or 'START'}')"
+            )
+            return self._terminal_outcome("INCOMPLETE_SEGMENT")
+        self._resolve_progress.add(memo_key)
+        self._resolve_method_stack.append(method_name)
+        try:
+            within = self._within(
+                method_name, source_node_id, depth, source_is_log
+            )
+            resolved: Dict[Tuple[str, str], _Outcome] = {}
+            for outcome in within.values():
+                if outcome.kind != LogFlowExtractor._ABSTRACT_RETURN:
+                    self._merge_outcome(resolved, outcome)
+                    continue
+                facts = outcome.facts.copy()
+                if is_root:
+                    self._merge_outcome(
+                        resolved,
+                        _Outcome(next_marker=None, kind="RETURN_SEGMENT", facts=facts),
+                    )
+                    continue
+                sites = self._return_sites_map().get(method_name, [])
+                if not sites:
+                    self._merge_outcome(
+                        resolved,
+                        _Outcome(
+                            next_marker=None, kind="INCOMPLETE_SEGMENT", facts=facts
+                        ),
+                    )
+                    self.limited.append(
+                        f"no call site of '{method_name}' inside the flow; "
+                        f"its return was modelled as an incomplete exit"
+                    )
+                    continue
+                if depth >= self._x.max_call_depth:
+                    self._merge_outcome(
+                        resolved,
+                        _Outcome(
+                            next_marker=None, kind="INCOMPLETE_SEGMENT", facts=facts
+                        ),
+                    )
+                    self.limited.append(
+                        f"call depth limit {self._x.max_call_depth} reached at "
+                        f"returns of '{method_name}'"
+                    )
+                    continue
+                for caller_name, call_node_id in sites:
+                    caller_successors = self._successors_map(caller_name).get(
+                        call_node_id, []
+                    )
+                    for target_id, condition in caller_successors:
+                        continuation = self._resolve_source(
+                            caller_name,
+                            f"after:{method_name}:{call_node_id}:{target_id}",
+                            target_id,
+                            depth + 1,
+                            is_root=False,
+                            source_is_log=False,
+                        )
+                        for sub in continuation.values():
+                            merged = _Outcome(
+                                next_marker=sub.next_marker,
+                                kind=sub.kind,
+                                facts=facts.copy(),
+                            )
+                            merged.facts.add_condition(condition)
+                            merged.facts.merge(sub.facts)
+                            self._merge_outcome(resolved, merged)
+            self._resolve_memo[memo_key] = resolved
+            return resolved
+        finally:
+            self._resolve_progress.discard(memo_key)
+            self._resolve_method_stack.pop()
+
+    # ── within one method (downward summaries) ──────────────────────────
+
+    def _within(
+        self,
+        method_name: str,
+        source_node_id: str,
+        depth: int,
+        source_is_log: bool,
+    ) -> Dict[Tuple[str, str], _Outcome]:
+        graph = self._graphs[method_name]
+        memo_key = (method_name, f"{source_node_id}|{'log' if source_is_log else 'start'}")
+        if memo_key in self._within_memo:
+            return self._within_memo[memo_key]
+        if memo_key in self._within_progress:
+            # Downward recursion: approximate the recursive call as a call
+            # that simply returns.
+            self.limited.append(f"recursive call into '{method_name}' was cut off")
+            return {
+                ("", LogFlowExtractor._ABSTRACT_RETURN): _Outcome(
+                    next_marker=None, kind=LogFlowExtractor._ABSTRACT_RETURN
+                )
+            }
+        self._within_progress.add(memo_key)
+        self.touched_methods.add(method_name)
+        try:
+            successors = self._successors_map(method_name)
+            outcomes = self._walk(
+                method_name, graph, successors, source_node_id, depth, source_is_log
+            )
+            self._within_memo[memo_key] = outcomes
+            return outcomes
+        finally:
+            self._within_progress.discard(memo_key)
+
+    def _walk(
+        self,
+        method_name: str,
         graph: SemanticFlowGraph,
         successors: Dict[str, List[Tuple[str, str]]],
         source_node_id: str,
+        depth: int,
         source_is_log: bool,
-        known_methods: Set[str],
-    ) -> Dict[Tuple[str, str], _Outcome]:
-        """Data-flow walk from one source boundary to next boundaries.
+    ) -> Dict[Tuple[str, str], "_Outcome"]:
+        """Fixpoint walk over one graph from one boundary source.
 
         ``facts_at_node`` is merged monotonically and a node is reconsidered
         only when that metadata changes. Therefore loops are finite and no CFG
@@ -394,19 +673,14 @@ class LogFlowExtractor:
         queue: deque[str] = deque()
 
         initial_targets = (
-            successors.get(source_node_id, [])
+            [target for target, _condition in successors.get(source_node_id, [])]
             if source_is_log
-            else [(source_node_id, "")]
+            else [source_node_id]
         )
-        for target_id, condition in initial_targets:
+        for target_id in initial_targets:
             facts = _SegmentFacts()
-            facts.add_condition(condition)
-            current = facts_at_node.get(target_id)
-            if current is None:
-                facts_at_node[target_id] = facts
-                queue.append(target_id)
-            elif current.merge(facts):
-                queue.append(target_id)
+            facts_at_node[target_id] = facts
+            queue.append(target_id)
 
         outcomes: Dict[Tuple[str, str], _Outcome] = {}
 
@@ -422,6 +696,17 @@ class LogFlowExtractor:
                 )
             else:
                 outcome.facts.merge(facts)
+
+        def propagate(local: _SegmentFacts, outgoing: List[Tuple[str, str]]) -> None:
+            for target_id, condition in outgoing:
+                propagated = local.copy()
+                propagated.add_condition(condition)
+                existing = facts_at_node.get(target_id)
+                if existing is None:
+                    facts_at_node[target_id] = propagated
+                    queue.append(target_id)
+                elif existing.merge(propagated):
+                    queue.append(target_id)
 
         processed: Dict[
             str, Tuple[Tuple[str, ...], Tuple[str, ...], Tuple[str, ...]]
@@ -439,42 +724,134 @@ class LogFlowExtractor:
             processed[node_id] = fingerprint
 
             unit = graph.nodes.get(node_id)
-            marker = self._marker_for_unit(unit)
-            # The source log was skipped above; every other log is a boundary.
+            marker = self._x._marker_for_unit(unit)
+            # Every logger CALL is a boundary. (A log source is seeded from
+            # its successors, so it can only reappear here through a loop
+            # back-edge — which is a new occurrence of that same call.)
             if marker is not None:
                 add_outcome(marker, "START_SEGMENT", facts)
                 continue
 
             local = facts.copy()
             if unit is not None:
-                local.add_unit(unit, known_methods)
+                local.add_unit(unit, self._known)
+
             if unit is not None and unit.kind is SemanticUnitKind.RETURN:
-                add_outcome(None, "RETURN_SEGMENT", local)
+                add_outcome(None, LogFlowExtractor._ABSTRACT_RETURN, local)
                 continue
 
             outgoing = successors.get(node_id, [])
             if not outgoing:
                 kind = (
-                    "RETURN_SEGMENT"
+                    LogFlowExtractor._ABSTRACT_RETURN
                     if node_id in graph.return_node_ids
                     else "INCOMPLETE_SEGMENT"
                 )
                 add_outcome(None, kind, local)
                 continue
 
-            for target_id, condition in outgoing:
-                propagated = local.copy()
-                propagated.add_condition(condition)
-                existing = facts_at_node.get(target_id)
-                if existing is None:
-                    facts_at_node[target_id] = propagated
-                    queue.append(target_id)
-                elif existing.merge(propagated):
-                    queue.append(target_id)
+            internal = (
+                [
+                    callee
+                    for callee in unit.internal_callee_full_names
+                    if callee in self._graphs
+                ]
+                if unit is not None
+                else []
+            )
+            if internal and depth < self._x.max_call_depth:
+                for callee in internal:
+                    if callee in self._resolve_method_stack:
+                        # Recursive re-entry: approximate the call as one that
+                        # simply returns, and report the cut-off explicitly.
+                        self.limited.append(
+                            f"recursive call into '{callee}' was cut off"
+                        )
+                        merged = local.copy()
+                        merged.add_direct_method(callee)
+                        propagate(merged, outgoing)
+                        continue
+                    callee_graph = self._graphs[callee]
+                    sub = self._within(
+                        callee,
+                        callee_graph.start_node_id,
+                        depth + 1,
+                        source_is_log=False,
+                    )
+                    for sub_outcome in sub.values():
+                        merged = local.copy()
+                        merged.add_direct_method(callee)
+                        merged.merge(sub_outcome.facts)
+                        if sub_outcome.next_marker is not None:
+                            add_outcome(
+                                sub_outcome.next_marker, "START_SEGMENT", merged
+                            )
+                        else:
+                            # Callee finished (or was cut off): continue the
+                            # caller strictly at this call site's successors.
+                            propagate(merged, outgoing)
+                continue
+
+            propagate(local, outgoing)
 
         if not outcomes:
             add_outcome(None, "INCOMPLETE_SEGMENT", _SegmentFacts())
         return outcomes
+
+    # ── helpers ─────────────────────────────────────────────────────────
+
+    def _terminal_outcome(self, kind: str) -> Dict[Tuple[str, str], "_Outcome"]:
+        return {
+            ("", kind): _Outcome(next_marker=None, kind=kind, facts=_SegmentFacts())
+        }
+
+    @staticmethod
+    def _merge_outcome(
+        target: Dict[Tuple[str, str], "_Outcome"], outcome: "_Outcome"
+    ) -> None:
+        key = (
+            outcome.next_marker.call_node_id if outcome.next_marker else "",
+            outcome.kind,
+        )
+        existing = target.get(key)
+        if existing is None:
+            target[key] = _Outcome(
+                next_marker=outcome.next_marker,
+                kind=outcome.kind,
+                facts=outcome.facts.copy(),
+            )
+        else:
+            existing.facts.merge(outcome.facts)
+
+    def _successors_map(
+        self, method_name: str
+    ) -> Dict[str, List[Tuple[str, str]]]:
+        cached = self._successors.get(method_name)
+        if cached is None:
+            by_source: Dict[str, List[Tuple[str, str]]] = defaultdict(list)
+            for edge in self._graphs[method_name].edge_list:
+                by_source[edge.source_id].append((edge.target_id, edge.condition))
+            cached = dict(by_source)
+            self._successors[method_name] = cached
+            graph = self._graphs[method_name]
+            self.all_call_ids_in_touched.update(
+                str(call_id)
+                for unit in graph.nodes.values()
+                for call_id in unit.call_node_ids
+            )
+        return cached
+
+    def _return_sites_map(self) -> Dict[str, List[Tuple[str, str]]]:
+        if self._return_sites is not None:
+            return self._return_sites
+        sites: Dict[str, List[Tuple[str, str]]] = defaultdict(list)
+        for method_name, graph in self._graphs.items():
+            for node_id, unit in graph.nodes.items():
+                for callee in unit.internal_callee_full_names:
+                    if callee in self._graphs and callee != method_name:
+                        sites[callee].append((method_name, node_id))
+        self._return_sites = dict(sites)
+        return self._return_sites
 
 
 def printlogfsm(fsm: StaticLogFSM) -> None:

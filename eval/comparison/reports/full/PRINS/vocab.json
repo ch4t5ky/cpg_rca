@@ -1,0 +1,7 @@
+{
+  "operation started": "E0000",
+  "attempt started": "E0001",
+  "operation succeeded": "E0002",
+  "operation finished": "E0003",
+  "temporary failure, retrying": "E0004"
+}
